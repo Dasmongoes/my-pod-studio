@@ -1,35 +1,35 @@
-import { Phone, Users, Zap, Shield, Headphones, Leaf } from "lucide-react";
+import { Zap, Shield, Truck, Sparkles, TrendingUp, Users } from "lucide-react";
 
 const features = [
   {
-    icon: Phone,
-    title: "Acoustic Excellence",
-    description: "Superior soundproofing for private conversations and focused work",
-  },
-  {
-    icon: Users,
-    title: "Flexible Capacity",
-    description: "From solo pods to team meeting spaces, we have the right size",
-  },
-  {
     icon: Zap,
-    title: "Quick Installation",
-    description: "Modular design allows setup in hours, not days",
+    title: "Lightning Fast",
+    description: "Orders printed and shipped within 2-4 business days",
   },
   {
     icon: Shield,
-    title: "Premium Materials",
-    description: "Durable construction with high-quality, sustainable materials",
+    title: "Premium Quality",
+    description: "High-quality fabrics and eco-friendly inks",
   },
   {
-    icon: Headphones,
-    title: "Tech-Ready",
-    description: "Integrated power, USB ports, and AV equipment compatibility",
+    icon: Truck,
+    title: "Free Shipping",
+    description: "Free worldwide shipping on all orders over $50",
   },
   {
-    icon: Leaf,
-    title: "Eco-Friendly",
-    description: "Sustainable materials and energy-efficient ventilation systems",
+    icon: Sparkles,
+    title: "Easy Designer",
+    description: "Intuitive design tools with thousands of templates",
+  },
+  {
+    icon: TrendingUp,
+    title: "Track Sales",
+    description: "Real-time analytics and profit tracking dashboard",
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Join 50k+ creators selling custom designs",
   },
 ];
 
@@ -37,25 +37,17 @@ const Features = () => {
   return (
     <section className="py-24 bg-background">
       <div className="container px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Why Choose PodSpace
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Engineered for performance, designed for comfort
-          </p>
-        </div>
-        
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <div 
               key={feature.title}
-              className="p-6 rounded-xl border border-border bg-card hover:shadow-soft transition-all duration-300"
+              className="p-8 rounded-2xl border border-border bg-card hover:bg-gradient-card hover:border-primary/30 transition-all duration-300 group animate-fade-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-primary-foreground" />
+              <div className="w-14 h-14 rounded-xl bg-gradient-hero flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-glow">
+                <feature.icon className="w-7 h-7 text-background" />
               </div>
-              <h3 className="text-xl font-semibold text-card-foreground mb-2">
+              <h3 className="text-xl font-bold text-card-foreground mb-2">
                 {feature.title}
               </h3>
               <p className="text-muted-foreground">

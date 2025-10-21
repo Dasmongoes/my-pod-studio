@@ -1,45 +1,58 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
-import Products from "@/components/Products";
+import FeaturedDesigns from "@/components/FeaturedDesigns";
+import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
-import Contact from "@/components/Contact";
+import CTA from "@/components/CTA";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
       <Navigation />
       <Hero />
-      <Products />
+      <FeaturedDesigns />
+      <HowItWorks />
       <Features />
-      <Contact />
+      <CTA />
       
-      <footer className="bg-primary text-primary-foreground py-12">
+      <footer className="bg-foreground text-background py-12">
         <div className="container px-4">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4">PodSpace</h3>
-              <p className="text-primary-foreground/80">
-                Transforming workspaces with innovative privacy solutions.
+              <h3 className="text-2xl font-black bg-gradient-accent bg-clip-text text-transparent mb-4">
+                PrintFlow
+              </h3>
+              <p className="text-background/70">
+                Create and sell custom apparel with zero upfront costs.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <h4 className="font-bold mb-4">Products</h4>
               <ul className="space-y-2">
-                <li><a href="#products" className="text-primary-foreground/80 hover:text-primary-foreground">Products</a></li>
-                <li><a href="#features" className="text-primary-foreground/80 hover:text-primary-foreground">Features</a></li>
-                <li><a href="#contact" className="text-primary-foreground/80 hover:text-primary-foreground">Contact</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">T-Shirts</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">Hoodies</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">Accessories</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <p className="text-primary-foreground/80">
-                Email: hello@podspace.com<br />
-                Phone: (555) 123-4567
-              </p>
+              <h4 className="font-bold mb-4">Resources</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-background/70 hover:text-background">Design Guide</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">Pricing</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">FAQs</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Company</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-background/70 hover:text-background">About</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">Contact</a></li>
+                <li><a href="#" className="text-background/70 hover:text-background">Blog</a></li>
+              </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-primary-foreground/20 text-center text-primary-foreground/60">
-            <p>&copy; 2025 PodSpace. All rights reserved.</p>
+          <div className="pt-8 border-t border-background/20 text-center text-background/60">
+            <p>&copy; 2025 PrintFlow. All rights reserved.</p>
           </div>
         </div>
       </footer>
