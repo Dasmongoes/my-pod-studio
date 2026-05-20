@@ -1,94 +1,58 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Heart, ShoppingCart } from "lucide-react";
 import tshirt1 from "@/assets/tshirt-1.jpg";
 import tshirt2 from "@/assets/tshirt-2.jpg";
 import tshirt3 from "@/assets/tshirt-3.jpg";
 import tshirt4 from "@/assets/tshirt-4.jpg";
 
 const designs = [
-  {
-    id: 1,
-    name: "Geometric Burst",
-    price: "$29.99",
-    image: tshirt1,
-    tag: "Trending",
-  },
-  {
-    id: 2,
-    name: "Neon Dreams",
-    price: "$32.99",
-    image: tshirt2,
-    tag: "New",
-  },
-  {
-    id: 3,
-    name: "Minimalist Lines",
-    price: "$27.99",
-    image: tshirt3,
-    tag: "Popular",
-  },
-  {
-    id: 4,
-    name: "Retro Wave",
-    price: "$31.99",
-    image: tshirt4,
-    tag: "Limited",
-  },
+  { id: 1, name: "Essential Oversized Tee", price: "$85", image: tshirt1, tag: "Core" },
+  { id: 2, name: "Heavyweight Crew", price: "$95", image: tshirt2, tag: "New" },
+  { id: 3, name: "Vintage Wash Tee", price: "$90", image: tshirt3, tag: "Limited" },
+  { id: 4, name: "Relaxed Boxy Tee", price: "$88", image: tshirt4, tag: "FW26" },
 ];
 
 const FeaturedDesigns = () => {
   return (
-    <section className="py-24 bg-background">
-      <div className="container px-4">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-gradient-accent text-accent-foreground border-0">
-            Featured Collection
-          </Badge>
-          <h2 className="text-5xl md:text-6xl font-black text-foreground mb-4">
-            Trending Designs
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Explore our most popular custom designs loved by thousands
-          </p>
+    <section id="shop" className="bg-background py-20 lg:py-32">
+      <div className="px-6 lg:px-10">
+        <div className="flex items-end justify-between mb-12 lg:mb-16">
+          <div>
+            <p className="text-eyebrow text-muted-foreground mb-3">Latest Drop</p>
+            <h2 className="text-display text-5xl md:text-7xl">FW26 Essentials.</h2>
+          </div>
+          <a href="#" className="hidden md:inline-flex text-eyebrow border-b border-foreground pb-1 hover:opacity-60 transition-opacity">
+            View All →
+          </a>
         </div>
-        
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12 lg:gap-x-6">
           {designs.map((design, index) => (
-            <Card 
-              key={design.id} 
-              className="group overflow-hidden border-border bg-card hover:shadow-vibrant transition-all duration-500 cursor-pointer animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+            <a
+              href="#"
+              key={design.id}
+              className="group block animate-fade-in"
+              style={{ animationDelay: `${index * 0.08}s` }}
             >
-              <div className="relative aspect-square overflow-hidden bg-muted">
-                <img 
-                  src={design.image} 
+              <div className="relative aspect-[4/5] overflow-hidden bg-muted mb-4">
+                <img
+                  src={design.image}
                   alt={design.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  loading="lazy"
+                  width={800}
+                  height={1024}
+                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
                 />
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-primary text-primary-foreground border-0 shadow-lg">
-                    {design.tag}
-                  </Badge>
-                </div>
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button className="p-2 rounded-full bg-background/90 hover:bg-background shadow-lg transition-colors">
-                    <Heart className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary-hover shadow-lg transition-colors">
-                    <ShoppingCart className="w-4 h-4" />
-                  </button>
-                </div>
+                <span className="absolute top-3 left-3 text-eyebrow bg-background/90 px-2 py-1">
+                  {design.tag}
+                </span>
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg text-card-foreground mb-1">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="text-sm font-medium text-foreground uppercase tracking-wide">
                   {design.name}
                 </h3>
-                <p className="text-2xl font-black bg-gradient-accent bg-clip-text text-transparent">
-                  {design.price}
-                </p>
+                <span className="text-sm font-medium shrink-0">{design.price}</span>
               </div>
-            </Card>
+              <p className="text-xs text-muted-foreground mt-1">3 colorways</p>
+            </a>
           ))}
         </div>
       </div>

@@ -1,71 +1,34 @@
-import { Palette, Upload, Rocket, DollarSign } from "lucide-react";
-
 const steps = [
-  {
-    icon: Palette,
-    title: "Create Your Design",
-    description: "Use our designer tool or upload your own artwork",
-    color: "text-primary",
-  },
-  {
-    icon: Upload,
-    title: "Upload & Customize",
-    description: "Choose products, colors, and set your prices",
-    color: "text-secondary",
-  },
-  {
-    icon: Rocket,
-    title: "Start Selling",
-    description: "Share your store and promote your designs",
-    color: "text-accent",
-  },
-  {
-    icon: DollarSign,
-    title: "We Handle the Rest",
-    description: "We print, pack, and ship every order for you",
-    color: "text-primary",
-  },
+  { n: "01", title: "Design", desc: "Upload artwork or build in our studio with templates and tools." },
+  { n: "02", title: "Customize", desc: "Choose products, colorways, sizing, and set your retail price." },
+  { n: "03", title: "Launch", desc: "Go live in minutes — share your store and start selling." },
+  { n: "04", title: "We Fulfill", desc: "We print on premium blanks, pack, and ship every order globally." },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="py-24 bg-gradient-card">
-      <div className="container px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-black text-foreground mb-4">
-            How It Works
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start selling in 4 simple steps
+    <section id="journal" className="bg-secondary border-t border-border">
+      <div className="px-6 lg:px-10 py-20 lg:py-32">
+        <div className="grid lg:grid-cols-12 gap-12 mb-16">
+          <div className="lg:col-span-5">
+            <p className="text-eyebrow text-muted-foreground mb-3">The Process</p>
+            <h2 className="text-display text-5xl md:text-7xl">Made on<br/>demand.</h2>
+          </div>
+          <p className="lg:col-span-6 lg:col-start-7 text-lg text-muted-foreground leading-relaxed self-end">
+            Zero inventory. Zero waste. Every garment is produced only after it's sold — built for creators who care about quality and consequence.
           </p>
         </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => (
-            <div 
-              key={step.title}
-              className="relative text-center animate-fade-in"
-              style={{ animationDelay: `${index * 0.15}s` }}
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 border-t border-border">
+          {steps.map((step, i) => (
+            <div
+              key={step.n}
+              className="border-b md:border-r border-border last:border-r-0 py-10 pr-6 lg:pr-10 lg:py-14 animate-fade-in"
+              style={{ animationDelay: `${i * 0.1}s` }}
             >
-              <div className="mb-6 inline-flex">
-                <div className="relative">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-glow`}>
-                    <step.icon className="w-10 h-10 text-background" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-background border-4 border-background flex items-center justify-center">
-                    <span className="text-sm font-black text-foreground">{index + 1}</span>
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {step.title}
-              </h3>
-              <p className="text-muted-foreground">
-                {step.description}
-              </p>
-              {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent -translate-x-1/2" />
-              )}
+              <span className="text-eyebrow text-muted-foreground">{step.n}</span>
+              <h3 className="text-display text-3xl mt-6 mb-3">{step.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
