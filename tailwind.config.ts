@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Inter Tight', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter Tight', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -91,16 +92,6 @@ export default {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "slide-up": "slide-up 0.6s ease-out forwards",
         "bounce-slow": "bounce 3s infinite",
-      },
-      backgroundImage: {
-        'gradient-hero': 'var(--gradient-hero)',
-        'gradient-card': 'var(--gradient-card)',
-        'gradient-accent': 'var(--gradient-accent)',
-      },
-      boxShadow: {
-        'vibrant': 'var(--shadow-vibrant)',
-        'glow': 'var(--shadow-glow)',
-        'soft': 'var(--shadow-soft)',
       },
       keyframes: {
         "slide-up": {
