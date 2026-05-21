@@ -1,4 +1,6 @@
-import { Search, User, ShoppingBag, Menu } from "lucide-react";
+import { Search, User, Menu } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CartDrawer } from "@/components/CartDrawer";
 
 const Navigation = () => {
   return (
@@ -9,16 +11,16 @@ const Navigation = () => {
             <Menu className="w-5 h-5" />
           </button>
           <div className="hidden lg:flex items-center gap-7 text-eyebrow">
-            <a href="#shop" className="hover:opacity-60 transition-opacity">Shop</a>
-            <a href="#collections" className="hover:opacity-60 transition-opacity">Collections</a>
-            <a href="#lookbook" className="hover:opacity-60 transition-opacity">Lookbook</a>
-            <a href="#journal" className="hover:opacity-60 transition-opacity">Journal</a>
+            <a href="/#shop" className="hover:opacity-60 transition-opacity">Shop</a>
+            <a href="/#collections" className="hover:opacity-60 transition-opacity">Collections</a>
+            <a href="/#lookbook" className="hover:opacity-60 transition-opacity">Lookbook</a>
+            <a href="/#journal" className="hover:opacity-60 transition-opacity">Journal</a>
           </div>
         </div>
 
-        <a href="/" className="text-display text-2xl tracking-tighter font-medium absolute left-1/2 -translate-x-1/2">
+        <Link to="/" className="text-display text-2xl tracking-tighter font-medium absolute left-1/2 -translate-x-1/2">
           PRINTFLOW
-        </a>
+        </Link>
 
         <div className="flex items-center gap-5 flex-1 justify-end text-eyebrow">
           <button aria-label="Search" className="hover:opacity-60 transition-opacity">
@@ -27,10 +29,7 @@ const Navigation = () => {
           <button aria-label="Account" className="hover:opacity-60 transition-opacity hidden sm:block">
             <User className="w-4 h-4" />
           </button>
-          <button aria-label="Bag" className="hover:opacity-60 transition-opacity flex items-center gap-1.5">
-            <ShoppingBag className="w-4 h-4" />
-            <span>Bag (0)</span>
-          </button>
+          <CartDrawer />
         </div>
       </div>
     </nav>
