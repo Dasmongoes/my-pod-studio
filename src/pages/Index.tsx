@@ -25,7 +25,7 @@ const Index = () => {
         <div className="px-6 lg:px-10 py-16">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
             <div className="col-span-2 md:col-span-2">
-              <div className="text-display text-3xl mb-4">PRINTFLOW</div>
+              <div className="text-display text-3xl mb-4">BincoHub</div>
               <p className="text-sm text-muted-foreground max-w-xs">
                 Premium print-on-demand apparel. Designed in studio, made on demand, shipped worldwide.
               </p>
@@ -59,7 +59,7 @@ const Index = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between gap-4 text-xs text-muted-foreground uppercase tracking-wider">
-            <p>© 2026 PRINTFLOW. All Rights Reserved.</p>
+            <p>© 2026 BincoHub. All Rights Reserved.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-foreground">Privacy</a>
               <a href="#" className="hover:text-foreground">Terms</a>

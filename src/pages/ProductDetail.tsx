@@ -66,7 +66,7 @@ const ProductDetail = () => {
               ))}
             </div>
             <div className="lg:sticky lg:top-24 lg:self-start">
-              <p className="text-eyebrow text-muted-foreground mb-3">PRINTFLOW</p>
+              <p className="text-eyebrow text-muted-foreground mb-3">BincoHub</p>
               <h1 className="text-display text-4xl md:text-5xl mb-6">{product.title}</h1>
               <p className="text-lg font-medium mb-8">
                 {product.priceRange.minVariantPrice.currencyCode}{" "}

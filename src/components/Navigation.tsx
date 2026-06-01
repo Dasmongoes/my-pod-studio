@@ -19,7 +19,7 @@ const Navigation = () => {
         </div>
 
         <Link to="/" className="text-display text-2xl tracking-tighter font-medium absolute left-1/2 -translate-x-1/2">
-          PRINTFLOW
+          BincoHub
         </Link>
 
         <div className="flex items-center gap-5 flex-1 justify-end text-eyebrow">

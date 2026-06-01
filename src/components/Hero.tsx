@@ -5,7 +5,7 @@ const Hero = () => {
     <section className="relative h-screen w-full overflow-hidden bg-black">
       <img
         src={heroBg}
-        alt="PRINTFLOW campaign"
+        alt="BincoHub campaign"
         width={1920}
         height={1280}
         className="absolute inset-0 w-full h-full object-cover opacity-90"
