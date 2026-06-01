@@ -25,7 +25,7 @@ const Index = () => {
         <div className="px-6 lg:px-10 py-16">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
             <div className="col-span-2 md:col-span-2">
-              <div className="text-display text-3xl mb-4">PRINTFLOW</div>
+              <div className="text-display text-3xl mb-4">BincoHub</div>
               <p className="text-sm text-muted-foreground max-w-xs">
                 Premium print-on-demand apparel. Designed in studio, made on demand, shipped worldwide.
               </p>
