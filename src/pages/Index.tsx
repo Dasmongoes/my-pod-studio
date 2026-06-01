@@ -59,7 +59,7 @@ const Index = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between gap-4 text-xs text-muted-foreground uppercase tracking-wider">
-            <p>© 2026 PRINTFLOW. All Rights Reserved.</p>
+            <p>© 2026 BincoHub. All Rights Reserved.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-foreground">Privacy</a>
               <a href="#" className="hover:text-foreground">Terms</a>
