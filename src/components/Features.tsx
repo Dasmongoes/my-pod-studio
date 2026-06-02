@@ -1,8 +1,8 @@
 const categories = [
-  { name: "T-Shirts", count: "24 Pieces" },
-  { name: "Hoodies", count: "12 Pieces" },
-  { name: "Outerwear", count: "8 Pieces" },
-  { name: "Accessories", count: "16 Pieces" },
+  { name: "Graphics", count: "24 Tees" },
+  { name: "Typography", count: "16 Tees" },
+  { name: "Oversized", count: "12 Tees" },
+  { name: "Vintage Wash", count: "10 Tees" },
 ];
 
 const Features = () => {
@@ -10,8 +10,8 @@ const Features = () => {
     <section id="collections" className="bg-background border-t border-border">
       <div className="px-6 lg:px-10 py-20 lg:py-28">
         <div className="mb-12">
-          <p className="text-eyebrow text-muted-foreground mb-3">Shop By Category</p>
-          <h2 className="text-display text-5xl md:text-7xl">Collections.</h2>
+          <p className="text-eyebrow text-muted-foreground mb-3">Shop By Style</p>
+          <h2 className="text-display text-5xl md:text-7xl">Tee Collections.</h2>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 border-t border-border">

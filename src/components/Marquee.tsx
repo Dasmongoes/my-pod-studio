@@ -1,10 +1,10 @@
 const items = [
   "FREE SHIPPING OVER $150",
-  "NEW DROP — FW26",
-  "MADE ON DEMAND",
-  "NO MINIMUMS",
+  "NEW TEE DROP — FW26",
+  "100% HEAVYWEIGHT COTTON",
+  "PRINTED ON DEMAND",
   "WORLDWIDE DELIVERY",
-  "DESIGN. PRINT. SHIP.",
+  "ONE PRODUCT. DONE RIGHT.",
 ];
 
 const Marquee = () => {
