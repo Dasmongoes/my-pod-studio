@@ -1,8 +1,8 @@
 const steps = [
-  { n: "01", title: "Design", desc: "Upload artwork or build in our studio with templates and tools." },
-  { n: "02", title: "Customize", desc: "Choose products, colorways, sizing, and set your retail price." },
-  { n: "03", title: "Launch", desc: "Go live in minutes — share your store and start selling." },
-  { n: "04", title: "We Fulfill", desc: "We print on premium blanks, pack, and ship every order globally." },
+  { n: "01", title: "Pick A Tee", desc: "Browse our edit of printed t-shirts — graphics, typography, oversized, washed." },
+  { n: "02", title: "Choose Size", desc: "Heavyweight 280gsm cotton. Unisex sizing from XS to 3XL." },
+  { n: "03", title: "We Print", desc: "Each tee is printed to order on premium blanks — never warehoused." },
+  { n: "04", title: "Ships Worldwide", desc: "Packed and dispatched within 72 hours. Delivered to your door." },
 ];
 
 const HowItWorks = () => {
@@ -15,7 +15,7 @@ const HowItWorks = () => {
             <h2 className="text-display text-5xl md:text-7xl">Made on<br/>demand.</h2>
           </div>
           <p className="lg:col-span-6 lg:col-start-7 text-lg text-muted-foreground leading-relaxed self-end">
-            Zero inventory. Zero waste. Every garment is produced only after it's sold — built for creators who care about quality and consequence.
+            One product. Done properly. Every t-shirt is printed only after it's ordered — no inventory, no waste, no compromise on quality.
           </p>
         </div>
 

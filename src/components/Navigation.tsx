@@ -11,10 +11,10 @@ const Navigation = () => {
             <Menu className="w-5 h-5" />
           </button>
           <div className="hidden lg:flex items-center gap-7 text-eyebrow">
-            <a href="/#shop" className="hover:opacity-60 transition-opacity">Shop</a>
-            <a href="/#collections" className="hover:opacity-60 transition-opacity">Collections</a>
+            <a href="/#shop" className="hover:opacity-60 transition-opacity">Shop Tees</a>
+            <a href="/#collections" className="hover:opacity-60 transition-opacity">Styles</a>
             <a href="/#lookbook" className="hover:opacity-60 transition-opacity">Lookbook</a>
-            <a href="/#journal" className="hover:opacity-60 transition-opacity">Journal</a>
+            <a href="/#journal" className="hover:opacity-60 transition-opacity">Process</a>
           </div>
         </div>
 

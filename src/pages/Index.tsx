@@ -27,16 +27,16 @@ const Index = () => {
             <div className="col-span-2 md:col-span-2">
               <div className="text-display text-3xl mb-4">BincoHub</div>
               <p className="text-sm text-muted-foreground max-w-xs">
-                Premium print-on-demand apparel. Designed in studio, made on demand, shipped worldwide.
+                Premium printed t-shirts. Heavyweight cotton, made on demand, shipped worldwide.
               </p>
             </div>
             <div>
               <h4 className="text-eyebrow mb-4">Shop</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground">T-Shirts</a></li>
-                <li><a href="#" className="hover:text-foreground">Hoodies</a></li>
-                <li><a href="#" className="hover:text-foreground">Outerwear</a></li>
-                <li><a href="#" className="hover:text-foreground">Accessories</a></li>
+                <li><a href="#" className="hover:text-foreground">Graphic Tees</a></li>
+                <li><a href="#" className="hover:text-foreground">Typography Tees</a></li>
+                <li><a href="#" className="hover:text-foreground">Oversized Tees</a></li>
+                <li><a href="#" className="hover:text-foreground">Vintage Wash</a></li>
               </ul>
             </div>
             <div>
