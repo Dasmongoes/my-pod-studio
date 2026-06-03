@@ -1,6 +1,5 @@
-import { Search, User, Menu } from "lucide-react";
+import { Search, User, Menu, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CartDrawer } from "@/components/CartDrawer";
 
 const Navigation = () => {
   return (
@@ -29,7 +28,9 @@ const Navigation = () => {
           <button aria-label="Account" className="hover:opacity-60 transition-opacity hidden sm:block">
             <User className="w-4 h-4" />
           </button>
-          <CartDrawer />
+          <button aria-label="Bag" className="hover:opacity-60 transition-opacity">
+            <ShoppingBag className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </nav>
