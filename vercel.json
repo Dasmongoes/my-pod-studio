@@ -1,0 +1,9 @@
+{
+  "buildCommand": "pnpm --filter @workspace/printflow run build",
+  "outputDirectory": "artifacts/printflow/dist/public",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api(.*)", "destination": "/api/index" }
+  ]
+}
