@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Product catalog
 paths:
   /healthz:
     get:
@@ -24,6 +26,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List products
+      description: Returns all products in the catalog
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +50,25 @@ components:
           type: string
       required:
         - status
-
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        subtitle:
+          type: string
+        priceUsd:
+          type: integer
+        tag:
+          type: string
+          nullable: true
+        category:
+          type: string
+      required:
+        - id
+        - title
+        - subtitle
+        - priceUsd
+        - category

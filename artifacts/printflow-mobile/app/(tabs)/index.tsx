@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Platform,
@@ -14,19 +15,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
+import { useListProducts } from "@workspace/api-client-react";
+import type { Product } from "@workspace/api-client-react";
 
 const { width } = Dimensions.get("window");
 
-const PRODUCTS = [
-  { id: "1", title: "Bird Form", subtitle: "Graphic Tee", price: "USD 45", tag: "NEW" },
-  { id: "2", title: "Manifest", subtitle: "Typography Tee", price: "USD 42", tag: null },
-  { id: "3", title: "Mono", subtitle: "Oversized Tee", price: "USD 48", tag: "BEST" },
-  { id: "4", title: "001", subtitle: "Vintage Wash", price: "USD 50", tag: null },
-];
-
 const CATEGORIES = ["All", "Graphics", "Typography", "Oversized", "Vintage"];
 
-function ProductCard({ product, index }: { product: typeof PRODUCTS[0]; index: number }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   const colors = useColors();
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
   const [inBag, setInBag] = useState(false);
@@ -43,6 +39,8 @@ function ProductCard({ product, index }: { product: typeof PRODUCTS[0]; index: n
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setInBag((v) => !v);
   };
+
+  const priceLabel = `USD ${product.priceUsd}`;
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, styles.cardOuter]}>
@@ -70,7 +68,7 @@ function ProductCard({ product, index }: { product: typeof PRODUCTS[0]; index: n
             </Text>
             <Text style={[styles.cardTitle, { color: colors.foreground }]}>{product.title}</Text>
           </View>
-          <Text style={[styles.cardPrice, { color: colors.foreground }]}>{product.price}</Text>
+          <Text style={[styles.cardPrice, { color: colors.foreground }]}>{priceLabel}</Text>
         </View>
         {/* Add to bag */}
         <Pressable
@@ -106,6 +104,13 @@ export default function ShopScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [activeCategory, setActiveCategory] = useState("All");
+
+  const { data: allProducts = [], isLoading, isError } = useListProducts();
+
+  const products =
+    activeCategory === "All"
+      ? allProducts
+      : allProducts.filter((p) => p.category === activeCategory);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : 0;
@@ -197,11 +202,23 @@ export default function ShopScreen() {
         </View>
 
         {/* Product grid */}
-        <View style={styles.grid}>
-          {PRODUCTS.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </View>
+        {isLoading ? (
+          <View style={styles.centered}>
+            <ActivityIndicator color={colors.foreground} />
+          </View>
+        ) : isError ? (
+          <View style={styles.centered}>
+            <Text style={[styles.errorText, { color: colors.mutedForeground }]}>
+              Failed to load products.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.grid}>
+            {products.map((p, i) => (
+              <ProductCard key={p.id} product={p} index={i} />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -347,5 +364,13 @@ const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: 1.5,
     fontFamily: "Inter_600SemiBold",
+  },
+  centered: {
+    padding: 40,
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
   },
 });
