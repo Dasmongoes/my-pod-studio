@@ -6,6 +6,7 @@ import Lookbook from "@/components/Lookbook";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import CTA from "@/components/CTA";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -33,10 +34,10 @@ const Index = () => {
             <div>
               <h4 className="text-eyebrow mb-4">Shop</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground">Graphic Tees</a></li>
-                <li><a href="#" className="hover:text-foreground">Typography Tees</a></li>
-                <li><a href="#" className="hover:text-foreground">Oversized Tees</a></li>
-                <li><a href="#" className="hover:text-foreground">Vintage Wash</a></li>
+                <li><Link to="/shop?style=Graphic%20Tees" className="hover:text-foreground">Graphic Tees</Link></li>
+                <li><Link to="/shop?style=Typography%20Tees" className="hover:text-foreground">Typography Tees</Link></li>
+                <li><Link to="/shop?style=Oversized%20Tees" className="hover:text-foreground">Oversized Tees</Link></li>
+                <li><Link to="/shop?style=Vintage%20Wash" className="hover:text-foreground">Vintage Wash</Link></li>
               </ul>
             </div>
             <div>

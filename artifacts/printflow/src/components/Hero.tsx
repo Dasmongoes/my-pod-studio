@@ -1,4 +1,5 @@
 import heroBg from "@/assets/hero-bg.jpg";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -24,9 +25,9 @@ const Hero = () => {
             ON - DEMAND
           </h1>
           <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <a href="#shop" className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-eyebrow hover:bg-white/90 transition-colors">
+            <Link to="/shop" className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-eyebrow hover:bg-white/90 transition-colors">
               Shop The Tees
-            </a>
+            </Link>
             <a href="#lookbook" className="inline-flex items-center gap-3 border border-white/40 text-white px-8 py-4 text-eyebrow hover:bg-white/10 transition-colors">
               View Lookbook
             </a>
