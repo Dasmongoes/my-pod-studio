@@ -1,7 +1,10 @@
-import tshirt1 from "@/assets/tshirt-1.jpg";
-import tshirt2 from "@/assets/tshirt-2.jpg";
-import tshirt3 from "@/assets/tshirt-3.jpg";
-import tshirt4 from "@/assets/tshirt-4.jpg";
+// Shopify Storefront API client for PRINTFLOW.
+// Storefront token is a public, browser-safe credential.
+
+export const SHOPIFY_API_VERSION = "2025-07";
+export const SHOPIFY_STORE_PERMANENT_DOMAIN = "my-pod-studio-kevwu.myshopify.com";
+export const SHOPIFY_STOREFRONT_TOKEN = "3a49b840fd37c5f393c2393d54b7f7ee";
+export const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
 export interface ShopifyImage {
   url: string;
@@ -51,291 +54,38 @@ export interface ShopifyProduct {
   variants: ShopifyProductVariant[];
 }
 
-// Get configurations from localStorage (user override) or env variables
-export const getShopifyCredentials = () => {
-  const localDomain = localStorage.getItem("shopify_store_domain");
-  const localToken = localStorage.getItem("shopify_storefront_access_token");
+interface UserError {
+  field: string[] | null;
+  message: string;
+}
 
-  const envDomain = import.meta.env.VITE_SHOPIFY_STORE_DOMAIN;
-  const envToken = import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN || import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN;
-
-  return {
-    domain: localDomain || envDomain || "",
-    accessToken: localToken || envToken || "",
-    apiVersion: import.meta.env.VITE_SHOPIFY_API_VERSION || "2024-04",
-  };
-};
-
-export const isShopifyConfigured = () => {
-  const { domain, accessToken } = getShopifyCredentials();
-  return !!(domain && accessToken);
-};
-
-// Custom GraphQL Client
-const shopifyFetch = async (query: string, variables = {}) => {
-  const { domain, accessToken, apiVersion } = getShopifyCredentials();
-
-  if (!domain || !accessToken) {
-    throw new Error("Shopify credentials not configured");
-  }
-
-  // Clean domain input in case user added https:// or trailing slashes
-  const cleanDomain = domain
-    .replace(/^https?:\/\//, "")
-    .replace(/\/$/, "");
-
-  const url = `https://${cleanDomain}/api/${apiVersion}/graphql.json`;
-
-  const response = await fetch(url, {
+export async function storefrontApiRequest<T = any>(query: string, variables: Record<string, any> = {}): Promise<{ data?: T; errors?: { message: string }[] } | undefined> {
+  const response = await fetch(SHOPIFY_STOREFRONT_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Shopify-Storefront-Access-Token": accessToken,
+      "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_TOKEN,
     },
     body: JSON.stringify({ query, variables }),
   });
 
+  if (response.status === 402) {
+    console.error("Shopify Storefront API: payment required (402). The store needs an active Shopify plan.");
+    return;
+  }
+
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Shopify API error (${response.status}): ${errorText}`);
+    throw new Error(`Shopify API error (${response.status})`);
   }
 
-  const json = (await response.json()) as {
-    errors?: { message: string }[];
-    data?: Record<string, unknown>;
-  };
-  if (json.errors) {
-    throw new Error(`Shopify GraphQL error: ${json.errors.map((e) => e.message).join(", ")}`);
-  }
+  return response.json();
+}
 
-  return json.data;
-};
+// ---------- GraphQL ----------
 
-// Detailed beautiful local mock products
-export const mockProducts: ShopifyProduct[] = [
-  {
-    id: "gid://shopify/Product/1",
-    title: "Graphic Tee — Bird Form",
-    handle: "graphic-tee-bird-form",
-    description: "Relaxed fit heavyweight printed graphic tee. Custom designed bird form typography screen-print at front chest. Made from premium 280gsm cotton, pre-shrunk and garment dyed for a soft vintage finish.",
-    descriptionHtml: "<p>Relaxed fit heavyweight printed graphic tee. Custom designed bird form typography screen-print at front chest. Made from premium 280gsm cotton, pre-shrunk and garment dyed for a soft vintage finish.</p><ul><li>280gsm 100% Organic Cotton</li><li>Double-needle stitched neck and hems</li><li>Preshrunk to minimize shrinkage</li><li>Ethically made in Portugal</li></ul>",
-    availableForSale: true,
-    images: [
-      { url: tshirt1, altText: "Graphic Tee — Bird Form Front" },
-      { url: tshirt2, altText: "Graphic Tee — Bird Form Detail" }
-    ],
-    priceRange: {
-      minVariantPrice: { amount: "45.00", currencyCode: "USD" },
-      maxVariantPrice: { amount: "45.00", currencyCode: "USD" }
-    },
-    options: [
-      { name: "Size", values: ["S", "M", "L", "XL"] },
-      { name: "Color", values: ["Vintage Black", "Off White"] }
-    ],
-    variants: [
-      {
-        id: "gid://shopify/ProductVariant/11",
-        title: "S / Vintage Black",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }, { name: "Color", value: "Vintage Black" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/12",
-        title: "M / Vintage Black",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }, { name: "Color", value: "Vintage Black" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/13",
-        title: "L / Vintage Black",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "L" }, { name: "Color", value: "Vintage Black" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/14",
-        title: "XL / Vintage Black",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "XL" }, { name: "Color", value: "Vintage Black" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/15",
-        title: "S / Off White",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }, { name: "Color", value: "Off White" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/16",
-        title: "M / Off White",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }, { name: "Color", value: "Off White" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/17",
-        title: "L / Off White",
-        availableForSale: true,
-        price: { amount: "45.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "L" }, { name: "Color", value: "Off White" }]
-      }
-    ]
-  },
-  {
-    id: "gid://shopify/Product/2",
-    title: "Typography Tee — Manifest",
-    handle: "typography-tee-manifest",
-    description: "An understated message in a loud world. Minimalist Helvetica typography screen-printed in high density puff ink across the back. Crafted from heavyweight ring-spun combed cotton.",
-    descriptionHtml: "<p>An understated message in a loud world. Minimalist Helvetica typography screen-printed in high density puff ink across the back. Crafted from heavyweight ring-spun combed cotton.</p>",
-    availableForSale: true,
-    images: [
-      { url: tshirt2, altText: "Typography Tee — Manifest Back" },
-      { url: tshirt3, altText: "Typography Tee — Manifest Detail" }
-    ],
-    priceRange: {
-      minVariantPrice: { amount: "42.00", currencyCode: "USD" },
-      maxVariantPrice: { amount: "42.00", currencyCode: "USD" }
-    },
-    options: [
-      { name: "Size", values: ["S", "M", "L", "XL"] },
-      { name: "Color", values: ["Off White", "Slate Grey"] }
-    ],
-    variants: [
-      {
-        id: "gid://shopify/ProductVariant/21",
-        title: "S / Off White",
-        availableForSale: true,
-        price: { amount: "42.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }, { name: "Color", value: "Off White" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/22",
-        title: "M / Off White",
-        availableForSale: true,
-        price: { amount: "42.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }, { name: "Color", value: "Off White" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/23",
-        title: "L / Off White",
-        availableForSale: true,
-        price: { amount: "42.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "L" }, { name: "Color", value: "Off White" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/24",
-        title: "S / Slate Grey",
-        availableForSale: true,
-        price: { amount: "42.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }, { name: "Color", value: "Slate Grey" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/25",
-        title: "M / Slate Grey",
-        availableForSale: true,
-        price: { amount: "42.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }, { name: "Color", value: "Slate Grey" }]
-      }
-    ]
-  },
-  {
-    id: "gid://shopify/Product/3",
-    title: "Oversized Tee — Mono",
-    handle: "oversized-tee-mono",
-    description: "Slouchy drop shoulder aesthetic. Cut wider through the chest with longer sleeves for a clean drape. Heavy 300gsm raw cotton that retains its boxy shape wash after wash.",
-    descriptionHtml: "<p>Slouchy drop shoulder aesthetic. Cut wider through the chest with longer sleeves for a clean drape. Heavy 300gsm raw cotton that retains its boxy shape wash after wash.</p>",
-    availableForSale: true,
-    images: [
-      { url: tshirt3, altText: "Oversized Tee — Mono" }
-    ],
-    priceRange: {
-      minVariantPrice: { amount: "48.00", currencyCode: "USD" },
-      maxVariantPrice: { amount: "48.00", currencyCode: "USD" }
-    },
-    options: [
-      { name: "Size", values: ["S", "M", "L"] }
-    ],
-    variants: [
-      {
-        id: "gid://shopify/ProductVariant/31",
-        title: "S",
-        availableForSale: true,
-        price: { amount: "48.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/32",
-        title: "M",
-        availableForSale: true,
-        price: { amount: "48.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/33",
-        title: "L",
-        availableForSale: true,
-        price: { amount: "48.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "L" }]
-      }
-    ]
-  },
-  {
-    id: "gid://shopify/Product/4",
-    title: "Vintage Wash Tee — 001",
-    handle: "vintage-wash-tee-001",
-    description: "The ultimate faded black tee. Hand-distressed edge wear on ribs, enzyme washed for an incredibly soft broken-in feel. Medium-weight breathable cotton, double stitched seams.",
-    descriptionHtml: "<p>The ultimate faded black tee. Hand-distressed edge wear on ribs, enzyme washed for an incredibly soft broken-in feel. Medium-weight breathable cotton, double stitched seams.</p>",
-    availableForSale: true,
-    images: [
-      { url: tshirt4, altText: "Vintage Wash Tee — 001 Front" }
-    ],
-    priceRange: {
-      minVariantPrice: { amount: "50.00", currencyCode: "USD" },
-      maxVariantPrice: { amount: "50.00", currencyCode: "USD" }
-    },
-    options: [
-      { name: "Size", values: ["S", "M", "L", "XL"] }
-    ],
-    variants: [
-      {
-        id: "gid://shopify/ProductVariant/41",
-        title: "S",
-        availableForSale: true,
-        price: { amount: "50.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "S" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/42",
-        title: "M",
-        availableForSale: true,
-        price: { amount: "50.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "M" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/43",
-        title: "L",
-        availableForSale: true,
-        price: { amount: "50.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "L" }]
-      },
-      {
-        id: "gid://shopify/ProductVariant/44",
-        title: "XL",
-        availableForSale: true,
-        price: { amount: "50.00", currencyCode: "USD" },
-        selectedOptions: [{ name: "Size", value: "XL" }]
-      }
-    ]
-  }
-];
-
-// Graphql schemas
-const productsQuery = `
-  query getProducts {
-    products(first: 50) {
+const PRODUCTS_QUERY = `
+  query GetProducts($first: Int!, $query: String) {
+    products(first: $first, query: $query) {
       edges {
         node {
           id
@@ -344,54 +94,22 @@ const productsQuery = `
           description
           descriptionHtml
           availableForSale
-          images(first: 10) {
-            edges {
-              node {
-                url
-                altText
-                width
-                height
-              }
-            }
-          }
+          images(first: 10) { edges { node { url altText width height } } }
           priceRange {
-            minVariantPrice {
-              amount
-              currencyCode
-            }
-            maxVariantPrice {
-              amount
-              currencyCode
-            }
+            minVariantPrice { amount currencyCode }
+            maxVariantPrice { amount currencyCode }
           }
-          options {
-            name
-            values
-          }
+          options { name values }
           variants(first: 100) {
             edges {
               node {
                 id
                 title
                 availableForSale
-                price {
-                  amount
-                  currencyCode
-                }
-                compareAtPrice {
-                  amount
-                  currencyCode
-                }
-                image {
-                  url
-                  altText
-                  width
-                  height
-                }
-                selectedOptions {
-                  name
-                  value
-                }
+                price { amount currencyCode }
+                compareAtPrice { amount currencyCode }
+                image { url altText width height }
+                selectedOptions { name value }
               }
             }
           }
@@ -401,8 +119,8 @@ const productsQuery = `
   }
 `;
 
-const productByHandleQuery = `
-  query getProductByHandle($handle: String!) {
+const PRODUCT_BY_HANDLE_QUERY = `
+  query GetProductByHandle($handle: String!) {
     productByHandle(handle: $handle) {
       id
       title
@@ -410,54 +128,22 @@ const productByHandleQuery = `
       description
       descriptionHtml
       availableForSale
-      images(first: 10) {
-        edges {
-          node {
-            url
-            altText
-            width
-            height
-          }
-        }
-      }
+      images(first: 10) { edges { node { url altText width height } } }
       priceRange {
-        minVariantPrice {
-          amount
-          currencyCode
-        }
-        maxVariantPrice {
-          amount
-          currencyCode
-        }
+        minVariantPrice { amount currencyCode }
+        maxVariantPrice { amount currencyCode }
       }
-      options {
-        name
-        values
-      }
+      options { name values }
       variants(first: 100) {
         edges {
           node {
             id
             title
             availableForSale
-            price {
-              amount
-              currencyCode
-            }
-            compareAtPrice {
-              amount
-              currencyCode
-            }
-            image {
-              url
-              altText
-              width
-              height
-            }
-            selectedOptions {
-              name
-              value
-            }
+            price { amount currencyCode }
+            compareAtPrice { amount currencyCode }
+            image { url altText width height }
+            selectedOptions { name value }
           }
         }
       }
@@ -465,77 +151,69 @@ const productByHandleQuery = `
   }
 `;
 
-const cartCreateMutation = `
-  mutation createCart($input: CartInput!) {
+const CART_QUERY = `
+  query Cart($id: ID!) { cart(id: $id) { id totalQuantity } }
+`;
+
+const CART_CREATE_MUTATION = `
+  mutation CartCreate($input: CartInput!) {
     cartCreate(input: $input) {
       cart {
         id
         checkoutUrl
+        lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
       }
-      userErrors {
-        field
-        message
-      }
+      userErrors { field message }
     }
   }
 `;
 
-interface GraphQLImageEdge {
-  node: {
-    url: string;
-    altText: string | null;
-    width?: number;
-    height?: number;
-  };
-}
+const CART_LINES_ADD_MUTATION = `
+  mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+    cartLinesAdd(cartId: $cartId, lines: $lines) {
+      cart {
+        id
+        lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
+      }
+      userErrors { field message }
+    }
+  }
+`;
 
-interface GraphQLOption {
-  name: string;
-  values: string[];
-}
+const CART_LINES_UPDATE_MUTATION = `
+  mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+    cartLinesUpdate(cartId: $cartId, lines: $lines) {
+      cart { id }
+      userErrors { field message }
+    }
+  }
+`;
 
-interface GraphQLVariantEdge {
-  node: {
-    id: string;
-    title: string;
-    availableForSale: boolean;
-    price: ShopifyMoney;
-    compareAtPrice: ShopifyMoney | null;
-    image: {
-      url: string;
-      altText: string | null;
-      width?: number;
-      height?: number;
-    } | null;
-    selectedOptions: {
-      name: string;
-      value: string;
-    }[];
-  };
-}
+const CART_LINES_REMOVE_MUTATION = `
+  mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+      cart { id }
+      userErrors { field message }
+    }
+  }
+`;
 
-interface GraphQLProductNode {
+// ---------- normalizers ----------
+
+interface RawProductNode {
   id: string;
   title: string;
   handle: string;
   description: string;
   descriptionHtml?: string;
   availableForSale: boolean;
-  images: {
-    edges: GraphQLImageEdge[];
-  };
-  priceRange: {
-    minVariantPrice: ShopifyMoney;
-    maxVariantPrice: ShopifyMoney;
-  };
-  options: GraphQLOption[];
-  variants: {
-    edges: GraphQLVariantEdge[];
-  };
+  images: { edges: { node: ShopifyImage }[] };
+  priceRange: { minVariantPrice: ShopifyMoney; maxVariantPrice: ShopifyMoney };
+  options: ShopifyProductOption[];
+  variants: { edges: { node: ShopifyProductVariant }[] };
 }
 
-// Helper map to transform Shopify Storefront API GraphQL structures to flat interfaces
-function transformGraphQLProduct(node: GraphQLProductNode): ShopifyProduct {
+function normalizeProduct(node: RawProductNode): ShopifyProduct {
   return {
     id: node.id,
     title: node.title,
@@ -543,105 +221,110 @@ function transformGraphQLProduct(node: GraphQLProductNode): ShopifyProduct {
     description: node.description,
     descriptionHtml: node.descriptionHtml,
     availableForSale: node.availableForSale,
-    images: node.images.edges.map((e: GraphQLImageEdge) => ({
-      url: e.node.url,
-      altText: e.node.altText,
-      width: e.node.width,
-      height: e.node.height,
-    })),
-    priceRange: {
-      minVariantPrice: node.priceRange.minVariantPrice,
-      maxVariantPrice: node.priceRange.maxVariantPrice,
-    },
-    options: node.options.map((opt: GraphQLOption) => ({
-      name: opt.name,
-      values: opt.values,
-    })),
-    variants: node.variants.edges.map((e: GraphQLVariantEdge) => ({
-      id: e.node.id,
-      title: e.node.title,
-      availableForSale: e.node.availableForSale,
-      price: e.node.price,
-      compareAtPrice: e.node.compareAtPrice,
-      image: e.node.image ? {
-        url: e.node.image.url,
-        altText: e.node.image.altText,
-        width: e.node.image.width,
-        height: e.node.image.height,
-      } : null,
-      selectedOptions: e.node.selectedOptions.map((so: SelectedOption) => ({
-        name: so.name,
-        value: so.value,
-      })),
-    })),
+    images: node.images.edges.map((e) => e.node),
+    priceRange: node.priceRange,
+    options: node.options,
+    variants: node.variants.edges.map((e) => e.node),
   };
 }
 
+// ---------- products ----------
+
 export const shopify = {
-  getProducts: async (): Promise<ShopifyProduct[]> => {
-    if (!isShopifyConfigured()) {
-      return mockProducts;
-    }
-    try {
-      const data = await shopifyFetch(productsQuery) as unknown as {
-        products: { edges: { node: GraphQLProductNode }[] };
-      };
-      return data.products.edges.map((edge: { node: GraphQLProductNode }) => transformGraphQLProduct(edge.node));
-    } catch (error) {
-      console.warn("Failed to fetch products from Shopify. Falling back to mock data. Error:", error);
-      return mockProducts;
-    }
+  async getProducts(): Promise<ShopifyProduct[]> {
+    const res = await storefrontApiRequest<{ products: { edges: { node: RawProductNode }[] } }>(PRODUCTS_QUERY, { first: 50 });
+    const edges = res?.data?.products?.edges || [];
+    return edges.map((e) => normalizeProduct(e.node));
   },
 
-  getProductByHandle: async (handle: string): Promise<ShopifyProduct | null> => {
-    if (!isShopifyConfigured()) {
-      const mock = mockProducts.find((p) => p.handle === handle);
-      return mock || null;
-    }
-    try {
-      const data = await shopifyFetch(productByHandleQuery, { handle }) as unknown as {
-        productByHandle: GraphQLProductNode | null;
-      };
-      if (!data.productByHandle) return null;
-      return transformGraphQLProduct(data.productByHandle);
-    } catch (error) {
-      console.warn(`Failed to fetch product '${handle}' from Shopify. Falling back to mock data. Error:`, error);
-      const mock = mockProducts.find((p) => p.handle === handle);
-      return mock || null;
-    }
-  },
-
-  createCheckoutUrl: async (lineItems: { variantId: string; quantity: number }[]): Promise<string> => {
-    if (!isShopifyConfigured()) {
-      // In mock mode, direct checkout will show a nice modal or simulate checkout
-      return "mock-checkout-url";
-    }
-
-    try {
-      const variables = {
-        input: {
-          lines: lineItems.map((item) => ({
-            merchandiseId: item.variantId,
-            quantity: item.quantity,
-          })),
-        },
-      };
-
-      const data = await shopifyFetch(cartCreateMutation, variables) as unknown as {
-        cartCreate: {
-          cart: { id: string; checkoutUrl: string };
-          userErrors: { field: string[]; message: string }[];
-        };
-      };
-      
-      if (data.cartCreate.userErrors && data.cartCreate.userErrors.length > 0) {
-        throw new Error(data.cartCreate.userErrors[0].message);
-      }
-
-      return data.cartCreate.cart.checkoutUrl;
-    } catch (error) {
-      console.error("Failed to create Shopify checkout:", error);
-      throw error;
-    }
+  async getProductByHandle(handle: string): Promise<ShopifyProduct | null> {
+    const res = await storefrontApiRequest<{ productByHandle: RawProductNode | null }>(PRODUCT_BY_HANDLE_QUERY, { handle });
+    const node = res?.data?.productByHandle;
+    return node ? normalizeProduct(node) : null;
   },
 };
+
+// ---------- cart ----------
+
+function formatCheckoutUrl(checkoutUrl: string): string {
+  try {
+    const url = new URL(checkoutUrl);
+    url.searchParams.set("channel", "online_store");
+    return url.toString();
+  } catch {
+    return checkoutUrl;
+  }
+}
+
+function isCartNotFoundError(userErrors: UserError[]): boolean {
+  return userErrors.some((e) => {
+    const m = (e.message || "").toLowerCase();
+    return m.includes("cart not found") || m.includes("does not exist");
+  });
+}
+
+export async function createShopifyCart(variantId: string, quantity: number): Promise<{ cartId: string; checkoutUrl: string; lineId: string } | null> {
+  const res = await storefrontApiRequest<any>(CART_CREATE_MUTATION, {
+    input: { lines: [{ quantity, merchandiseId: variantId }] },
+  });
+  const payload = res?.data?.cartCreate;
+  if (!payload) return null;
+  if (payload.userErrors?.length) {
+    console.error("cartCreate errors", payload.userErrors);
+    return null;
+  }
+  const cart = payload.cart;
+  const lineId = cart?.lines?.edges?.[0]?.node?.id;
+  if (!cart?.checkoutUrl || !lineId) return null;
+  return { cartId: cart.id, checkoutUrl: formatCheckoutUrl(cart.checkoutUrl), lineId };
+}
+
+export async function addLineToShopifyCart(cartId: string, variantId: string, quantity: number): Promise<{ success: boolean; lineId?: string; cartNotFound?: boolean }> {
+  const res = await storefrontApiRequest<any>(CART_LINES_ADD_MUTATION, {
+    cartId,
+    lines: [{ quantity, merchandiseId: variantId }],
+  });
+  const payload = res?.data?.cartLinesAdd;
+  const userErrors: UserError[] = payload?.userErrors || [];
+  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
+  if (userErrors.length) {
+    console.error("cartLinesAdd errors", userErrors);
+    return { success: false };
+  }
+  const lines = payload?.cart?.lines?.edges || [];
+  const newLine = lines.find((l: any) => l.node.merchandise.id === variantId);
+  return { success: true, lineId: newLine?.node?.id };
+}
+
+export async function updateShopifyCartLine(cartId: string, lineId: string, quantity: number): Promise<{ success: boolean; cartNotFound?: boolean }> {
+  const res = await storefrontApiRequest<any>(CART_LINES_UPDATE_MUTATION, {
+    cartId,
+    lines: [{ id: lineId, quantity }],
+  });
+  const userErrors: UserError[] = res?.data?.cartLinesUpdate?.userErrors || [];
+  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
+  if (userErrors.length) {
+    console.error("cartLinesUpdate errors", userErrors);
+    return { success: false };
+  }
+  return { success: true };
+}
+
+export async function removeLineFromShopifyCart(cartId: string, lineId: string): Promise<{ success: boolean; cartNotFound?: boolean }> {
+  const res = await storefrontApiRequest<any>(CART_LINES_REMOVE_MUTATION, {
+    cartId,
+    lineIds: [lineId],
+  });
+  const userErrors: UserError[] = res?.data?.cartLinesRemove?.userErrors || [];
+  if (isCartNotFoundError(userErrors)) return { success: false, cartNotFound: true };
+  if (userErrors.length) {
+    console.error("cartLinesRemove errors", userErrors);
+    return { success: false };
+  }
+  return { success: true };
+}
+
+export async function fetchCart(cartId: string): Promise<{ id: string; totalQuantity: number } | null> {
+  const res = await storefrontApiRequest<any>(CART_QUERY, { id: cartId });
+  return res?.data?.cart || null;
+}
