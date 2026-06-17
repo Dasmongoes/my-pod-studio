@@ -1,10 +1,19 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { shopify, ShopifyProduct, ShopifyProductVariant } from "@/lib/shopify";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { toast } from "sonner";
+import {
+  ShopifyProduct,
+  ShopifyProductVariant,
+  createShopifyCart,
+  addLineToShopifyCart,
+  updateShopifyCartLine,
+  removeLineFromShopifyCart,
+  fetchCart,
+} from "@/lib/shopify";
 
 export interface CartItem {
-  id: string; // Combined key: variantId
+  id: string; // variantId (used as React key + cross-reference)
+  lineId: string | null;
   product: ShopifyProduct;
   variant: ShopifyProductVariant;
   quantity: number;
@@ -12,113 +21,180 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
+  cartId: string | null;
+  checkoutUrl: string | null;
   isCartOpen: boolean;
+  isLoading: boolean;
   isCheckingOut: boolean;
-  
-  // Actions
-  addItem: (product: ShopifyProduct, variant: ShopifyProductVariant, quantity?: number) => void;
-  removeItem: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
+  isSyncing: boolean;
+
+  addItem: (product: ShopifyProduct, variant: ShopifyProductVariant, quantity?: number) => Promise<void>;
+  removeItem: (itemId: string) => Promise<void>;
+  updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   toggleCartOpen: (open?: boolean) => void;
   checkout: () => Promise<void>;
+  syncCart: () => Promise<void>;
+  getCheckoutUrl: () => string | null;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      cartId: null,
+      checkoutUrl: null,
       isCartOpen: false,
+      isLoading: false,
       isCheckingOut: false,
+      isSyncing: false,
 
-      addItem: (product, variant, quantity = 1) => {
-        const items = get().items;
-        const existingItemIndex = items.findIndex((item) => item.variant.id === variant.id);
-
-        if (existingItemIndex > -1) {
-          const updatedItems = [...items];
-          updatedItems[existingItemIndex].quantity += quantity;
-          set({ items: updatedItems });
-        } else {
-          set({
-            items: [...items, { id: variant.id, product, variant, quantity }],
-          });
+      addItem: async (product, variant, quantity = 1) => {
+        const { items, cartId } = get();
+        const existing = items.find((i) => i.variant.id === variant.id);
+        set({ isLoading: true });
+        try {
+          if (!cartId) {
+            const result = await createShopifyCart(variant.id, quantity);
+            if (!result) {
+              toast.error("Failed to start cart");
+              return;
+            }
+            set({
+              cartId: result.cartId,
+              checkoutUrl: result.checkoutUrl,
+              items: [{ id: variant.id, lineId: result.lineId, product, variant, quantity }],
+              isCartOpen: true,
+            });
+            toast.success(`Added ${product.title} to your bag`);
+          } else if (existing && existing.lineId) {
+            const newQty = existing.quantity + quantity;
+            const result = await updateShopifyCartLine(cartId, existing.lineId, newQty);
+            if (result.cartNotFound) {
+              get().clearCart();
+              return;
+            }
+            if (!result.success) return;
+            set({
+              items: get().items.map((i) => (i.variant.id === variant.id ? { ...i, quantity: newQty } : i)),
+              isCartOpen: true,
+            });
+            toast.success(`Updated ${product.title} in your bag`);
+          } else {
+            const result = await addLineToShopifyCart(cartId, variant.id, quantity);
+            if (result.cartNotFound) {
+              get().clearCart();
+              return;
+            }
+            if (!result.success) return;
+            set({
+              items: [
+                ...get().items,
+                { id: variant.id, lineId: result.lineId ?? null, product, variant, quantity },
+              ],
+              isCartOpen: true,
+            });
+            toast.success(`Added ${product.title} to your bag`);
+          }
+        } catch (err) {
+          console.error("addItem failed", err);
+          toast.error("Couldn't add to cart");
+        } finally {
+          set({ isLoading: false });
         }
-        
-        // Open the cart drawer when adding an item to give immediate feedback
-        set({ isCartOpen: true });
-        toast.success(`Added ${product.title} (${variant.title}) to your bag`);
       },
 
-      removeItem: (itemId) => {
-        set({
-          items: get().items.filter((item) => item.id !== itemId),
-        });
-      },
-
-      updateQuantity: (itemId, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(itemId);
+      removeItem: async (itemId) => {
+        const { items, cartId } = get();
+        const item = items.find((i) => i.id === itemId);
+        if (!item || !cartId || !item.lineId) {
+          set({ items: items.filter((i) => i.id !== itemId) });
           return;
         }
-        set({
-          items: get().items.map((item) =>
-            item.id === itemId ? { ...item, quantity } : item
-          ),
-        });
+        set({ isLoading: true });
+        try {
+          const result = await removeLineFromShopifyCart(cartId, item.lineId);
+          if (result.cartNotFound) {
+            get().clearCart();
+            return;
+          }
+          const next = get().items.filter((i) => i.id !== itemId);
+          if (next.length === 0) get().clearCart();
+          else set({ items: next });
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
-      clearCart: () => {
-        set({ items: [] });
+      updateQuantity: async (itemId, quantity) => {
+        if (quantity <= 0) {
+          await get().removeItem(itemId);
+          return;
+        }
+        const { items, cartId } = get();
+        const item = items.find((i) => i.id === itemId);
+        if (!item || !cartId || !item.lineId) return;
+        set({ isLoading: true });
+        try {
+          const result = await updateShopifyCartLine(cartId, item.lineId, quantity);
+          if (result.cartNotFound) {
+            get().clearCart();
+            return;
+          }
+          if (!result.success) return;
+          set({ items: get().items.map((i) => (i.id === itemId ? { ...i, quantity } : i)) });
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
-      toggleCartOpen: (open) => {
-        set((state) => ({
-          isCartOpen: open !== undefined ? open : !state.isCartOpen,
-        }));
-      },
+      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
+
+      toggleCartOpen: (open) =>
+        set((state) => ({ isCartOpen: open !== undefined ? open : !state.isCartOpen })),
 
       checkout: async () => {
-        const items = get().items;
+        const { items, checkoutUrl } = get();
         if (items.length === 0) {
           toast.error("Your bag is empty");
           return;
         }
-
+        if (!checkoutUrl) {
+          toast.error("Checkout unavailable, please re-add an item");
+          return;
+        }
         set({ isCheckingOut: true });
-        
         try {
-          const lineItems = items.map((item) => ({
-            variantId: item.variant.id,
-            quantity: item.quantity,
-          }));
-
-          const checkoutUrl = await shopify.createCheckoutUrl(lineItems);
-          
-          if (checkoutUrl === "mock-checkout-url") {
-            // Demo Mode Checkout simulation
-            toast.success("Checkout Successful (Demo Mode)!", {
-              description: "In connected mode, this redirects to your Shopify Checkout page.",
-              duration: 5000,
-            });
-            // Show custom alert via event dispatch or local storage to let other elements intercept
-            window.dispatchEvent(new CustomEvent("shopify-demo-checkout"));
-          } else {
-            // Redirect to real Shopify Checkout
-            toast.info("Redirecting to Shopify Checkout...");
-            window.location.href = checkoutUrl;
-          }
-        } catch (error) {
-          console.error("Checkout error:", error);
-          toast.error("Failed to initiate checkout. Please verify your Shopify connection configurations.");
+          window.open(checkoutUrl, "_blank");
         } finally {
           set({ isCheckingOut: false });
         }
       },
+
+      getCheckoutUrl: () => get().checkoutUrl,
+
+      syncCart: async () => {
+        const { cartId, isSyncing } = get();
+        if (!cartId || isSyncing) return;
+        set({ isSyncing: true });
+        try {
+          const cart = await fetchCart(cartId);
+          if (!cart || cart.totalQuantity === 0) get().clearCart();
+        } catch (err) {
+          console.error("syncCart failed", err);
+        } finally {
+          set({ isSyncing: false });
+        }
+      },
     }),
     {
-      name: "bincohub-bag-storage",
-      partialize: (state) => ({ items: state.items }), // Persist only the items array
+      name: "printflow-cart",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        items: state.items,
+        cartId: state.cartId,
+        checkoutUrl: state.checkoutUrl,
+      }),
     }
   )
 );

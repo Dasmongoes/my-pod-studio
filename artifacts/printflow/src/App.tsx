@@ -8,16 +8,22 @@ import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 import CartDrawer from "./components/CartDrawer";
-import ShopifyConfig from "./components/ShopifyConfig";
+import { useCartSync } from "@/hooks/useCartSync";
 
 const queryClient = new QueryClient();
+
+function CartSyncMount() {
+  useCartSync();
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner position="top-center" />
       <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <CartSyncMount />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shop" element={<Shop />} />
@@ -25,7 +31,6 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CartDrawer />
-        <ShopifyConfig />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
