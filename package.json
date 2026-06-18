@@ -4,9 +4,9 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "dev": "corepack pnpm --filter @workspace/printflow run dev",
-    "build": "corepack pnpm run typecheck && corepack pnpm -r --if-present run build",
-    "build:dev": "corepack enable >/dev/null 2>&1; corepack pnpm install --frozen-lockfile=false && corepack pnpm --filter @workspace/printflow run build",
+    "dev": "PATH=\"$HOME/.local/bin:$PATH\" pnpm --filter @workspace/printflow run dev",
+    "build": "PATH=\"$HOME/.local/bin:$PATH\" sh -c 'mkdir -p $HOME/.local/bin && corepack enable --install-directory $HOME/.local/bin && pnpm install --no-frozen-lockfile && pnpm run typecheck && pnpm -r --if-present run build'",
+    "build:dev": "PATH=\"$HOME/.local/bin:$PATH\" sh -c 'mkdir -p $HOME/.local/bin && corepack enable --install-directory $HOME/.local/bin && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/printflow run build'",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
