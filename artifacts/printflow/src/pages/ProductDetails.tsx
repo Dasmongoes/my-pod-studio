@@ -1,56 +1,97 @@
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { shopify, ShopifyProduct, ShopifyProductVariant, formatPrice } from "@/lib/shopify";
+import {
+  shopify,
+  ShopifyProduct,
+  ShopPolicy,
+  defaultSelection,
+  findVariant,
+  formatPrice,
+  imageIndexFor,
+} from "@/lib/shopify";
 import { useCartStore } from "@/store/useCartStore";
+import { useRecentlyViewed } from "@/store/useRecentlyViewed";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import Navigation from "@/components/Navigation";
-import { ArrowLeft, Loader, ShoppingBag, Check, ShieldCheck, Truck, RefreshCw } from "lucide-react";
+import Footer from "@/components/Footer";
+import ProductGallery from "@/components/ProductGallery";
+import VariantPicker from "@/components/VariantPicker";
+import ProductCard, { ProductCardSkeleton } from "@/components/ProductCard";
+import QuickViewDialog from "@/components/QuickViewDialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Loader, ShoppingBag, ShieldCheck, Truck, RefreshCw, Minus, Plus, Share2 } from "lucide-react";
 import { toast } from "sonner";
+
+const MAX_QTY = 10;
 
 const ProductDetails = () => {
   const { handle } = useParams<{ handle: string }>();
-  const navigate = useNavigate();
-  const { addItem } = useCartStore();
+  const { addItem, isLoading: isAdding } = useCartStore();
+  const { handles: recentHandles, add: addRecent } = useRecentlyViewed();
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
+  const [quickView, setQuickView] = useState<ShopifyProduct | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Fetch product data
   const { data: product, isLoading, error } = useQuery<ShopifyProduct | null>({
     queryKey: ["product", handle],
     queryFn: () => shopify.getProductByHandle(handle || ""),
     enabled: !!handle,
   });
 
-  // Fetch other products for recommendations
-  const { data: allProducts = [] } = useQuery<ShopifyProduct[]>({
+  const { data: allProducts = [], isLoading: loadingAll } = useQuery<ShopifyProduct[]>({
     queryKey: ["products"],
     queryFn: shopify.getProducts,
   });
 
-  // Pre-select first variant's options when product loads
+  const { data: policies = [] } = useQuery<ShopPolicy[]>({
+    queryKey: ["policies"],
+    queryFn: shopify.getPolicies,
+    staleTime: 1000 * 60 * 30,
+  });
+
+  usePageTitle(product?.title ?? (isLoading ? null : "Product not found"));
+
+  // Pre-select the first in-stock variant when the product loads
   useEffect(() => {
-    if (product && product.variants.length > 0) {
-      const defaultVariant = product.variants[0];
-      const initial: Record<string, string> = {};
-      defaultVariant.selectedOptions.forEach((opt) => {
-        initial[opt.name] = opt.value;
-      });
-      setSelectedOptions(initial);
-      setSelectedImageIndex(Math.max(0, imageIndexFor(product, defaultVariant.image?.url)));
-      setQuantity(1);
-    }
+    if (!product) return;
+    const initial = defaultSelection(product);
+    setSelectedOptions(initial);
+    setSelectedImageIndex(Math.max(0, imageIndexFor(product, findVariant(product, initial)?.image?.url)));
+    setQuantity(1);
+    addRecent(product.handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product]);
+
+  // Show the mobile sticky "Add to Bag" bar once the main button scrolls out of view
+  useEffect(() => {
+    const el = addButtonRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setShowStickyBar(!entry.isIntersecting), {
+      rootMargin: "0px 0px -40px 0px",
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [product]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Loader className="w-8 h-8 animate-spin text-foreground" />
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading details...</p>
-        </div>
+        <main className="pt-24 px-6 lg:px-10 pb-24 grid lg:grid-cols-12 gap-12 lg:gap-16">
+          <div className="lg:col-span-7 aspect-[4/5] bg-muted animate-pulse" />
+          <div className="lg:col-span-5 space-y-6">
+            <div className="h-3 w-32 bg-muted animate-pulse" />
+            <div className="h-12 w-3/4 bg-muted animate-pulse" />
+            <div className="h-6 w-24 bg-muted animate-pulse" />
+            <div className="h-24 bg-muted animate-pulse" />
+            <div className="h-14 bg-muted animate-pulse" />
+          </div>
+        </main>
       </div>
     );
   }
@@ -70,273 +111,292 @@ const ProductDetails = () => {
     );
   }
 
-  // Find matching variant based on selected options state
-  const activeVariant = product.variants.find((variant) =>
-    variant.selectedOptions.every((opt) => selectedOptions[opt.name] === opt.value)
-  ) || product.variants[0];
+  const activeVariant = findVariant(product, selectedOptions);
+  const price = activeVariant?.price ?? product.priceRange.minVariantPrice;
+  const compareAt =
+    activeVariant?.compareAtPrice &&
+    parseFloat(activeVariant.compareAtPrice.amount) > parseFloat(activeVariant.price.amount)
+      ? activeVariant.compareAtPrice
+      : null;
+  const savingsPct = compareAt
+    ? Math.round((1 - parseFloat(price.amount) / parseFloat(compareAt.amount)) * 100)
+    : 0;
+  const canBuy = !!activeVariant?.availableForSale;
 
   const handleOptionChange = (optionName: string, value: string) => {
     const next = { ...selectedOptions, [optionName]: value };
     setSelectedOptions(next);
-    // Jump the gallery to the newly selected variant's photo, if it has one
-    const nextVariant = product.variants.find((variant) =>
-      variant.selectedOptions.every((opt) => next[opt.name] === opt.value)
-    );
-    const idx = imageIndexFor(product, nextVariant?.image?.url);
+    const idx = imageIndexFor(product, findVariant(product, next)?.image?.url);
     if (idx >= 0) setSelectedImageIndex(idx);
   };
 
   const handleAddToBag = () => {
     if (!activeVariant) {
-      toast.error("Please select all options");
+      toast.error("That combination isn't available — pick another option");
       return;
     }
     if (!activeVariant.availableForSale) {
-      toast.error("This variant is currently sold out");
+      toast.error("This option is sold out");
       return;
     }
     addItem(product, activeVariant, quantity);
   };
 
-  // Recommendations: exclude current product
-  const recommendations = allProducts
-    .filter((p) => p.id !== product.id)
-    .slice(0, 4);
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: product.title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied");
+      }
+    } catch {
+      /* share sheet dismissed */
+    }
+  };
 
-  // The gallery selection drives the main image; fall back to the variant's image, then the first image
-  const displayImage = product.images[selectedImageIndex]?.url || activeVariant?.image?.url || product.images[0]?.url;
+  const recommendations = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+  const recentlyViewed = recentHandles
+    .filter((h) => h !== product.handle)
+    .map((h) => allProducts.find((p) => p.handle === h))
+    .filter((p): p is ShopifyProduct => !!p)
+    .slice(0, 4);
+  const shippingPolicy = policies.find((p) => p.handle.includes("shipping"));
+  const refundPolicy = policies.find((p) => p.handle.includes("refund"));
+
+  const addLabel = !activeVariant ? "Unavailable" : canBuy ? "Add to Bag" : "Sold Out";
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="pt-24 px-6 lg:px-10 pb-24">
-        {/* Breadcrumb / Back Navigation */}
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-xs uppercase tracking-widest font-semibold hover:opacity-60 transition-opacity"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Back
-          </button>
-          
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:flex items-center gap-2">
-            <Link to="/" className="hover:text-foreground">Home</Link>
-            <span>/</span>
-            <Link to="/shop" className="hover:text-foreground">Shop</Link>
-            <span>/</span>
-            <span className="text-foreground font-semibold">{product.title}</span>
-          </div>
-        </div>
+        {/* Breadcrumb */}
+        <nav aria-label="Breadcrumb" className="mb-8 text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          <Link to="/" className="hover:text-foreground">Home</Link>
+          <span>/</span>
+          <Link to="/shop" className="hover:text-foreground">Shop</Link>
+          <span>/</span>
+          <span className="text-foreground font-semibold truncate">{product.title}</span>
+        </nav>
 
-        {/* Product Details Section */}
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 border-b border-border/60 pb-20 mb-20">
-          {/* Gallery - Left Side (Cols 7) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="aspect-[4/5] bg-muted relative overflow-hidden border border-border/30">
-              {displayImage ? (
-                <img
-                  src={displayImage}
-                  alt={product.title}
-                  className="w-full h-full object-cover transition-all duration-500"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                  No image available
-                </div>
-              )}
+          {/* Gallery */}
+          <div className="lg:col-span-7">
+            <div className="lg:sticky lg:top-24">
+              <ProductGallery
+                images={product.images}
+                index={selectedImageIndex}
+                onIndexChange={setSelectedImageIndex}
+                title={product.title}
+              />
             </div>
-
-            {/* Thumbnails grid */}
-            {product.images.length > 1 && (
-              <div className="grid grid-cols-6 gap-2">
-                {product.images.map((image, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImageIndex(idx)}
-                    className={`aspect-[4/5] bg-muted relative overflow-hidden border transition-all ${
-                      selectedImageIndex === idx ? "border-foreground" : "border-border/40 opacity-70 hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={image.url}
-                      alt={`${product.title} thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Product Info - Right Side (Cols 5) */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
-            <div className="space-y-6">
-              {/* Brand and Title */}
-              <div>
+          {/* Info */}
+          <div className="lg:col-span-5 space-y-8">
+            <div>
+              <div className="flex items-start justify-between gap-4">
                 <p className="text-eyebrow text-muted-foreground mb-2">BincoHub Collection</p>
-                <h1 className="text-display text-4xl sm:text-5xl leading-tight uppercase">
-                  {product.title}
-                </h1>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  aria-label="Share this product"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
               </div>
+              <h1 className="text-display text-4xl sm:text-5xl leading-tight uppercase">{product.title}</h1>
+            </div>
 
-              {/* Price and Stock status */}
+            <div>
               <div className="flex justify-between items-center border-y border-border py-4">
-                <span className="text-xl font-semibold text-foreground">
-                  {formatPrice(
-                    (activeVariant ? activeVariant.price : product.priceRange.minVariantPrice).amount,
-                    (activeVariant ? activeVariant.price : product.priceRange.minVariantPrice).currencyCode,
+                <div className="flex items-baseline gap-3">
+                  <span className="text-2xl font-semibold text-foreground">
+                    {formatPrice(price.amount, price.currencyCode)}
+                  </span>
+                  {compareAt && (
+                    <>
+                      <span className="text-sm text-muted-foreground line-through">
+                        {formatPrice(compareAt.amount, compareAt.currencyCode)}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-highlight">
+                        Save {savingsPct}%
+                      </span>
+                    </>
                   )}
-                </span>
-                
-                <span className={`text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 border ${
-                  activeVariant?.availableForSale 
-                    ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/5"
-                    : "text-destructive border-destructive/20 bg-destructive/5"
-                }`}>
-                  {activeVariant?.availableForSale ? "In Stock" : "Sold Out"}
-                </span>
-              </div>
-
-              {/* Option Selector fields */}
-              {product.options.map((option) => (
-                <div key={option.name} className="space-y-3">
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-foreground">
-                    Select {option.name}: <span className="text-muted-foreground font-medium ml-1">{selectedOptions[option.name]}</span>
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {option.values.map((val) => {
-                      const isSelected = selectedOptions[option.name] === val;
-                      return (
-                        <button
-                          key={val}
-                          onClick={() => handleOptionChange(option.name, val)}
-                          className={`px-4 py-3 text-xs uppercase font-medium border transition-all ${
-                            isSelected
-                              ? "bg-foreground text-background border-foreground font-bold"
-                              : "border-border hover:border-foreground/40 text-foreground"
-                          }`}
-                        >
-                          {val}
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
-              ))}
-
-              {/* Quantity selector */}
-              <div className="space-y-3">
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-foreground">
-                  Quantity
-                </label>
-                <div className="flex items-center border border-border w-32 bg-background">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-xs font-semibold">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
+                <span
+                  className={`text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 border ${
+                    canBuy
+                      ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/5"
+                      : "text-destructive border-destructive/20 bg-destructive/5"
+                  }`}
+                >
+                  {canBuy ? "In Stock" : "Sold Out"}
+                </span>
               </div>
-
-              {/* Description HTML */}
-              <div className="border-t border-border pt-6 mt-6">
-                <h3 className="text-[10px] uppercase tracking-widest font-bold mb-3">Product Story</h3>
-                <div 
-                  className="text-xs text-muted-foreground leading-relaxed uppercase space-y-4"
-                  dangerouslySetInnerHTML={{ __html: product.descriptionHtml || product.description }}
-                />
-              </div>
+              <p className="mt-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+                Shipping calculated at checkout.
+              </p>
             </div>
 
-            {/* Checkout & Add to Bag actions */}
-            <div className="space-y-4 pt-6 border-t border-border">
+            <VariantPicker product={product} selected={selectedOptions} onChange={handleOptionChange} />
+
+            {/* Quantity + Add */}
+            <div className="flex gap-3">
+              <div className="flex items-center border border-border bg-background">
+                <button
+                  type="button"
+                  aria-label="Decrease quantity"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={quantity <= 1}
+                  className="p-4 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <span className="w-8 text-center text-sm font-semibold" aria-live="polite">{quantity}</span>
+                <button
+                  type="button"
+                  aria-label="Increase quantity"
+                  onClick={() => setQuantity((q) => Math.min(MAX_QTY, q + 1))}
+                  disabled={quantity >= MAX_QTY}
+                  className="p-4 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
               <button
+                ref={addButtonRef}
+                type="button"
                 onClick={handleAddToBag}
-                disabled={!activeVariant?.availableForSale}
-                className="w-full rounded bg-highlight text-highlight-foreground py-5 uppercase tracking-widest text-xs font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all disabled:opacity-50"
+                disabled={!canBuy || isAdding}
+                className="flex-1 rounded bg-highlight text-highlight-foreground py-4 uppercase tracking-widest text-xs font-bold flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.99] transition-all disabled:opacity-50"
               >
-                <ShoppingBag className="w-4 h-4" />
-                {activeVariant?.availableForSale ? "Add to Bag" : "Sold Out"}
+                {isAdding ? <Loader className="w-4 h-4 animate-spin" /> : <ShoppingBag className="w-4 h-4" />}
+                {addLabel}
               </button>
+            </div>
 
-              {/* Streetwear highlights */}
-              <div className="grid grid-cols-3 gap-2 pt-6 text-center border-t border-border/40 text-[9px] uppercase tracking-wider text-muted-foreground">
-                <div className="space-y-1.5 p-2 bg-muted/20">
-                  <ShieldCheck className="w-4 h-4 mx-auto text-foreground" />
-                  <p className="font-semibold text-foreground">Premium Quality</p>
-                  <p>280gsm Heavyweight</p>
-                </div>
-                <div className="space-y-1.5 p-2 bg-muted/20">
-                  <Truck className="w-4 h-4 mx-auto text-foreground" />
-                  <p className="font-semibold text-foreground">Worldwide Shipping</p>
-                  <p>Tracked Delivery</p>
-                </div>
-                <div className="space-y-1.5 p-2 bg-muted/20">
-                  <RefreshCw className="w-4 h-4 mx-auto text-foreground" />
-                  <p className="font-semibold text-foreground">Made on Demand</p>
-                  <p>Sustainable Print</p>
-                </div>
+            {/* Highlights */}
+            <div className="grid grid-cols-3 gap-2 text-center text-[9px] uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 p-3 bg-muted/30">
+                <ShieldCheck className="w-4 h-4 mx-auto text-foreground" />
+                <p className="font-semibold text-foreground">Premium Quality</p>
+                <p>260 GSM Terry Cotton</p>
+              </div>
+              <div className="space-y-1.5 p-3 bg-muted/30">
+                <Truck className="w-4 h-4 mx-auto text-foreground" />
+                <p className="font-semibold text-foreground">Worldwide Shipping</p>
+                <p>Tracked Delivery</p>
+              </div>
+              <div className="space-y-1.5 p-3 bg-muted/30">
+                <RefreshCw className="w-4 h-4 mx-auto text-foreground" />
+                <p className="font-semibold text-foreground">Made on Demand</p>
+                <p>Sustainable Print</p>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Recommended products section */}
-        {recommendations.length > 0 && (
-          <div>
-            <h2 className="text-display text-3xl mb-8 uppercase">You May Also Like</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              {recommendations.map((recommend) => {
-                const recPrice = recommend.priceRange.minVariantPrice;
-                return (
-                  <Link
-                    key={recommend.id}
-                    to={`/product/${recommend.handle}`}
-                    className="group block"
-                  >
-                    <div className="aspect-[4/5] overflow-hidden bg-muted mb-3 border border-border/20">
-                      {recommend.images[0]?.url ? (
-                        <img
-                          src={recommend.images[0].url}
-                          alt={recommend.title}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                          No Image
-                        </div>
+            {/* Details */}
+            <Accordion type="multiple" defaultValue={["description"]} className="border-t border-border">
+              {(product.descriptionHtml || product.description) && (
+                <AccordionItem value="description">
+                  <AccordionTrigger className="text-[10px] uppercase tracking-widest font-bold">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div
+                      className="text-sm text-muted-foreground leading-relaxed space-y-3 [&_*]:![color:inherit] [&_*]:!bg-transparent [&_strong]:![color:hsl(var(--foreground))] [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-1"
+                      dangerouslySetInnerHTML={{ __html: product.descriptionHtml || product.description }}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+              {(shippingPolicy || refundPolicy) && (
+                <AccordionItem value="shipping">
+                  <AccordionTrigger className="text-[10px] uppercase tracking-widest font-bold">
+                    Shipping & Returns
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground space-y-2">
+                    <p>Every piece is printed to order, then shipped to you.</p>
+                    <div className="flex gap-4 text-xs uppercase tracking-widest font-semibold">
+                      {shippingPolicy && (
+                        <Link to={`/policies/${shippingPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
+                          Shipping policy
+                        </Link>
+                      )}
+                      {refundPolicy && (
+                        <Link to={`/policies/${refundPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
+                          Refund policy
+                        </Link>
                       )}
                     </div>
-                    <div className="flex justify-between items-start text-xs uppercase tracking-wider font-semibold">
-                      <span className="line-clamp-1">{recommend.title}</span>
-                      <span>{formatPrice(recPrice.amount, recPrice.currencyCode)}</span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
           </div>
+        </div>
+
+        {/* You may also like */}
+        {(loadingAll || recommendations.length > 0) && (
+          <section className="mb-20">
+            <h2 className="text-display text-3xl mb-8 uppercase">You May Also Like</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-6">
+              {loadingAll
+                ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+                : recommendations.map((p, i) => (
+                    <ProductCard key={p.id} product={p} index={i} onQuickView={setQuickView} />
+                  ))}
+            </div>
+          </section>
+        )}
+
+        {/* Recently viewed */}
+        {recentlyViewed.length > 0 && (
+          <section>
+            <h2 className="text-display text-3xl mb-8 uppercase">Recently Viewed</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 lg:gap-x-6">
+              {recentlyViewed.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} onQuickView={setQuickView} />
+              ))}
+            </div>
+          </section>
         )}
       </main>
+
+      <Footer />
+
+      {/* Mobile sticky add-to-bag bar */}
+      <div
+        className={`lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center gap-3 transition-transform duration-300 ${
+          showStickyBar ? "translate-y-0" : "translate-y-full"
+        }`}
+        aria-hidden={!showStickyBar}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider truncate">{product.title}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">
+            {Object.values(selectedOptions).join(" / ")} · {formatPrice(price.amount, price.currencyCode)}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddToBag}
+          disabled={!canBuy || isAdding}
+          tabIndex={showStickyBar ? 0 : -1}
+          className="rounded bg-highlight text-highlight-foreground px-5 py-3 uppercase tracking-widest text-[10px] font-bold flex items-center gap-2 disabled:opacity-50"
+        >
+          {isAdding ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+          {addLabel}
+        </button>
+      </div>
+
+      <QuickViewDialog product={quickView} onOpenChange={(o) => !o && setQuickView(null)} />
     </div>
   );
 };
 
 export default ProductDetails;
-
-// Index of an image URL within the product's gallery (ignores Shopify's ?v= cache-busting query), or -1.
-function imageIndexFor(product: ShopifyProduct, url?: string | null): number {
-  if (!url) return -1;
-  const base = url.split("?")[0];
-  return product.images.findIndex((img) => img.url.split("?")[0] === base);
-}

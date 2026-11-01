@@ -1,28 +1,36 @@
-import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
+  usePageTitle("Page not found");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
-      <div className="text-center max-w-sm">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navigation />
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-40 text-center">
         <p className="text-eyebrow text-muted-foreground mb-4">Error 404</p>
         <h1 className="text-display text-6xl md:text-8xl mb-6 uppercase">Lost.</h1>
-        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-10 leading-relaxed">
-          The page you requested does not exist or has been relocated in the archives.
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-10 leading-relaxed max-w-sm">
+          The page you requested doesn't exist or has moved.
         </p>
-        <Link 
-          to="/" 
-          className="inline-block text-xs uppercase tracking-widest bg-foreground text-background px-8 py-4 font-semibold hover:opacity-90 transition-opacity"
-        >
-          Return to Home
-        </Link>
-      </div>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Link
+            to="/shop"
+            className="text-xs uppercase tracking-widest bg-foreground text-background px-8 py-4 font-semibold hover:opacity-90 transition-opacity"
+          >
+            Shop all tees
+          </Link>
+          <Link
+            to="/"
+            className="text-xs uppercase tracking-widest border border-border px-8 py-4 font-semibold hover:border-foreground transition-colors"
+          >
+            Home
+          </Link>
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 };

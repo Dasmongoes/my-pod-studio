@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCartStore } from "@/store/useCartStore";
-import { Plus, Minus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatPrice } from "@/lib/shopify";
 
@@ -33,12 +33,13 @@ const CartDrawer = () => {
             <p className="text-xs text-muted-foreground mb-6 max-w-[240px]">
               Looks like you haven't added any products to your bag yet.
             </p>
-            <button
+            <Link
+              to="/shop"
               onClick={() => toggleCartOpen(false)}
               className="text-xs uppercase tracking-widest bg-foreground text-background px-6 py-3 hover:opacity-90 transition-opacity"
             >
-              Continue Shopping
-            </button>
+              Shop All Tees
+            </Link>
           </div>
         ) : (
           <>
@@ -140,6 +141,15 @@ const CartDrawer = () => {
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
+              </button>
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+                <Lock className="w-3 h-3" /> Secure checkout by Shopify
+              </p>
+              <button
+                onClick={() => toggleCartOpen(false)}
+                className="mt-3 w-full text-[10px] uppercase tracking-widest font-semibold text-muted-foreground hover:text-foreground underline underline-offset-4"
+              >
+                Continue Shopping
               </button>
             </div>
           </>
