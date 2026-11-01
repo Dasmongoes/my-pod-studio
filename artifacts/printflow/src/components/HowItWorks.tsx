@@ -11,7 +11,7 @@ const HowItWorks = () => {
       <div className="px-6 lg:px-10 py-20 lg:py-32">
         <div className="grid lg:grid-cols-12 gap-12 mb-16">
           <div className="lg:col-span-5">
-            <p className="text-eyebrow text-muted-foreground mb-3">The Process</p>
+            <p className="text-eyebrow eyebrow-bar text-muted-foreground mb-3">The Process</p>
             <h2 className="text-display text-5xl md:text-7xl">Made on<br/>demand.</h2>
           </div>
           <p className="lg:col-span-6 lg:col-start-7 text-lg text-muted-foreground leading-relaxed self-end">
@@ -26,7 +26,7 @@ const HowItWorks = () => {
               className="border-b md:border-r border-border last:border-r-0 py-10 pr-6 lg:pr-10 lg:py-14 animate-fade-in"
               style={{ animationDelay: `${i * 0.1}s` }}
             >
-              <span className="text-eyebrow text-muted-foreground">{step.n}</span>
+              <span className="text-display text-5xl text-highlight">{step.n}</span>
               <h3 className="text-display text-3xl mt-6 mb-3">{step.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>

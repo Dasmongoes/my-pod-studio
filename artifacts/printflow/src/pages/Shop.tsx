@@ -209,7 +209,7 @@ const Shop = () => {
                   {/* Add to bag CTA button */}
                   <button
                     onClick={(e) => handleQuickAdd(e, product)}
-                    className="mt-4 w-full text-[10px] uppercase tracking-widest font-bold border border-foreground py-3 bg-transparent hover:bg-foreground hover:text-background transition-all"
+                    className="mt-4 w-full text-[10px] uppercase tracking-widest font-bold border border-foreground py-3 bg-transparent hover:bg-highlight hover:border-highlight hover:text-highlight-foreground transition-all"
                   >
                     Quick Add
                   </button>

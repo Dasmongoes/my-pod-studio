@@ -36,12 +36,12 @@ const FeaturedDesigns = () => {
       <div className="px-6 lg:px-10">
         <div className="flex items-end justify-between mb-12 lg:mb-16">
           <div>
-            <p className="text-eyebrow text-muted-foreground mb-3">Latest Drop</p>
+            <p className="text-eyebrow eyebrow-bar text-muted-foreground mb-3">Latest Drop</p>
             <h2 className="text-display text-5xl md:text-7xl">FW26 Essentials.</h2>
           </div>
           <Link
             to="/shop"
-            className="text-xs uppercase tracking-widest font-semibold border-b border-foreground pb-1 hover:opacity-75 transition-opacity"
+            className="text-xs uppercase tracking-widest font-semibold border-b-2 border-highlight pb-1 hover:text-highlight transition-colors"
           >
             View All Collection &rarr;
           </Link>
@@ -76,7 +76,7 @@ const FeaturedDesigns = () => {
                   onMouseEnter={() => setHoveredProduct(p.id)}
                   onMouseLeave={() => setHoveredProduct(null)}
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden bg-muted mb-4 border border-border/20">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-card rounded-md mb-4">
                     {displayImage?.url ? (
                       <img
                         src={displayImage.url}
@@ -108,7 +108,7 @@ const FeaturedDesigns = () => {
 
                   <button
                     onClick={(e) => handleQuickAdd(e, p)}
-                    className="mt-3 w-full text-[10px] uppercase tracking-widest font-bold border border-foreground py-2.5 hover:bg-foreground hover:text-background transition-colors"
+                    className="mt-3 w-full text-[10px] uppercase tracking-widest font-bold rounded border border-foreground py-2.5 hover:bg-highlight hover:border-highlight hover:text-highlight-foreground transition-colors"
                   >
                     Add to Bag
                   </button>

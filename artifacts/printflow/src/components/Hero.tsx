@@ -20,15 +20,15 @@ const Hero = () => {
         </div>
 
         <div className="max-w-5xl">
-          <p className="text-eyebrow mb-6 opacity-80 animate-fade-in">Printed Tees / FW26</p>
+          <p className="text-eyebrow eyebrow-bar mb-6 animate-fade-in">Printed Tees / FW26</p>
           <h1 className="text-display text-[15vw] md:text-[10vw] lg:text-[8.5rem] leading-[0.85] mb-8 animate-slide-up">
             ON - DEMAND
           </h1>
           <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <Link to="/shop" className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-eyebrow hover:bg-white/90 transition-colors">
+            <Link to="/shop" className="inline-flex items-center gap-3 bg-highlight text-highlight-foreground rounded px-8 py-4 text-eyebrow hover:brightness-110 transition">
               Shop The Tees
             </Link>
-            <a href="#lookbook" className="inline-flex items-center gap-3 border border-white/40 text-white px-8 py-4 text-eyebrow hover:bg-white/10 transition-colors">
+            <a href="#lookbook" className="inline-flex items-center gap-3 border border-white text-white rounded px-8 py-4 text-eyebrow hover:bg-white hover:text-black transition-colors">
               View Lookbook
             </a>
           </div>

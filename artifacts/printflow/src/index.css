@@ -5,68 +5,56 @@
 /* Monochrome editorial streetwear design system. All colors MUST be HSL. */
 
 @layer base {
+  /* Dark sports-editorial theme: pure black canvas, graphite panels,
+     white type, one hot red-pink highlight. All colors MUST be HSL. */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 7%;
+    --background: 0 0% 0%;          /* #000 */
+    --foreground: 0 0% 100%;        /* #fff */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
+    --card: 0 0% 8%;                /* #151515 */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 0 0% 7%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 0 0% 15%;
-
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 7%;
-
-    --accent: 0 0% 92%;
-    --accent-foreground: 0 0% 7%;
-
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 0 0% 7%;
-
-    --radius: 0rem;
-  }
-
-  .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
-
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 7%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
     --primary-hover: 0 0% 85%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 10%;          /* #1a1a1a */
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 0 0% 12%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 16%;             /* #2a2a2a */
+    --accent-foreground: 0 0% 100%;
 
     --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 60%;   /* #999 */
 
-    --destructive: 0 70% 45%;
+    --highlight: 349 100% 58%;      /* #ff2850 */
+    --highlight-foreground: 0 0% 100%;
+
+    --destructive: 349 100% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 0 0% 98%;
+    --border: 0 0% 16%;             /* #2a2a2a */
+    --input: 0 0% 20%;
+    --ring: 349 100% 58%;
+
+    --radius: 0.25rem;
+  }
+
+  /* Light surface, used for inverted sections */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 0%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
   }
 }
 
@@ -81,23 +69,39 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: "ss01", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight;
+    font-family: 'Barlow Condensed', 'Roboto', system-ui, sans-serif;
+    @apply font-bold uppercase;
+  }
+
+  ::selection {
+    background: hsl(var(--highlight));
+    color: hsl(var(--highlight-foreground));
   }
 }
 
 @layer utilities {
   .text-display {
-    font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
-    font-weight: 500;
-    letter-spacing: -0.04em;
-    line-height: 0.9;
+    font-family: 'Barlow Condensed', 'Roboto', system-ui, sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
   }
   .text-eyebrow {
-    @apply uppercase tracking-[0.2em] text-xs font-medium;
+    @apply uppercase tracking-[0.14em] text-xs font-bold;
+  }
+  /* Short red bar placed before section labels */
+  .eyebrow-bar::before {
+    content: "";
+    display: inline-block;
+    width: 1.5rem;
+    height: 3px;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    background: hsl(var(--highlight));
   }
   .marquee {
     animation: marquee 30s linear infinite;

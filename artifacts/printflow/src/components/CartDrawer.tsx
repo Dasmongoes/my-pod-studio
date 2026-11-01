@@ -129,7 +129,7 @@ const CartDrawer = () => {
               <button
                 onClick={checkout}
                 disabled={isCheckingOut}
-                className="w-full bg-foreground text-background py-4 uppercase tracking-widest text-xs font-medium flex items-center justify-center gap-2 hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                className="w-full rounded bg-highlight text-highlight-foreground py-4 uppercase tracking-widest text-xs font-bold flex items-center justify-center gap-2 hover:brightness-110 transition disabled:opacity-50"
               >
                 {isCheckingOut ? (
                   <span className="inline-block w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin" />

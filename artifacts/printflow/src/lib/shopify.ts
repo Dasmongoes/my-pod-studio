@@ -2,8 +2,10 @@
 // Storefront token is a public, browser-safe credential.
 
 export const SHOPIFY_API_VERSION = "2025-07";
-export const SHOPIFY_STORE_PERMANENT_DOMAIN = "my-pod-studio-kevwu.myshopify.com";
-export const SHOPIFY_STOREFRONT_TOKEN = "3a49b840fd37c5f393c2393d54b7f7ee";
+export const SHOPIFY_STORE_PERMANENT_DOMAIN: string =
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || "k4uwvx-s1.myshopify.com";
+export const SHOPIFY_STOREFRONT_TOKEN: string =
+  import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "710e5eca4f7f6eb89a3330cc3462b68e";
 export const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
 export interface ShopifyImage {

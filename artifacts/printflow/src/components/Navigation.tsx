@@ -7,21 +7,21 @@ const Navigation = () => {
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <nav className="fixed top-0 w-full bg-background/90 backdrop-blur-md border-b border-border z-50">
+    <nav className="fixed top-0 w-full bg-background border-b border-border z-50">
       <div className="px-6 lg:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8 flex-1">
           <button className="lg:hidden" aria-label="Menu">
             <Menu className="w-5 h-5" />
           </button>
           <div className="hidden lg:flex items-center gap-7 text-eyebrow">
-            <Link to="/shop" className="hover:opacity-60 transition-opacity">Shop Tees</Link>
-            <a href="/#collections" className="hover:opacity-60 transition-opacity">Styles</a>
-            <a href="/#lookbook" className="hover:opacity-60 transition-opacity">Lookbook</a>
-            <a href="/#journal" className="hover:opacity-60 transition-opacity">Process</a>
+            <Link to="/shop" className="hover:text-highlight transition-colors">Shop Tees</Link>
+            <a href="/#collections" className="hover:text-highlight transition-colors">Styles</a>
+            <a href="/#lookbook" className="hover:text-highlight transition-colors">Lookbook</a>
+            <a href="/#journal" className="hover:text-highlight transition-colors">Process</a>
           </div>
         </div>
 
-        <Link to="/" className="text-display text-2xl tracking-tighter font-medium absolute left-1/2 -translate-x-1/2">
+        <Link to="/" className="text-display text-3xl absolute left-1/2 -translate-x-1/2">
           BincoHub
         </Link>
 
@@ -39,7 +39,7 @@ const Navigation = () => {
           >
             <ShoppingBag className="w-4 h-4" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-foreground text-background text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-fade-in">
+              <span className="absolute -top-1 -right-1 bg-highlight text-highlight-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-fade-in">
                 {totalItems}
               </span>
             )}

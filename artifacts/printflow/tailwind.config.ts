@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter Tight', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter Tight', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Roboto', 'system-ui', 'sans-serif'],
+        display: ['Barlow Condensed', 'Roboto', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -31,6 +31,10 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        highlight: {
+          DEFAULT: "hsl(var(--highlight))",
+          foreground: "hsl(var(--highlight-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

@@ -257,7 +257,7 @@ const ProductDetails = () => {
               <button
                 onClick={handleAddToBag}
                 disabled={!activeVariant?.availableForSale}
-                className="w-full bg-foreground text-background py-5 uppercase tracking-widest text-xs font-bold flex items-center justify-center gap-2 hover:bg-foreground/90 transition-all disabled:opacity-50"
+                className="w-full rounded bg-highlight text-highlight-foreground py-5 uppercase tracking-widest text-xs font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all disabled:opacity-50"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {activeVariant?.availableForSale ? "Add to Bag" : "Sold Out"}
