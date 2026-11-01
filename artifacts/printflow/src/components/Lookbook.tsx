@@ -21,9 +21,9 @@ const Lookbook = () => {
               One tee.<br/>Done right.
             </h2>
             <p className="text-base opacity-70 mb-10 leading-relaxed">
-              Premium 280gsm heavyweight cotton. Garment dyed, washed for a worn-in hand, and printed with archival inks. Built to outlast trends.
+              Premium 260 GSM heavyweight cotton. Garment dyed, washed for a worn-in hand, and printed with archival inks. Built to outlast trends.
             </p>
-            <a href="#" className="inline-flex items-center gap-3 border-b-2 border-highlight pb-1 text-eyebrow hover:opacity-70 transition-opacity">
+            <a href="#journal" className="inline-flex items-center gap-3 border-b-2 border-highlight pb-1 text-eyebrow hover:opacity-70 transition-opacity">
               Explore The Story →
             </a>
           </div>

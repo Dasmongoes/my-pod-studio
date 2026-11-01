@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { sitemapPlugin } from "./sitemap-plugin";
 
 // PORT and BASE_PATH are injected by Replit's proxy. On Vercel (and other
 // non-Replit hosts) they are absent — fall back to sensible defaults so
@@ -13,6 +14,7 @@ export default defineConfig({
   base: basePath,
   plugins: [
     react(),
+    sitemapPlugin(),
     // Replit-only dev plugins — skipped on Vercel and other non-Replit hosts
     ...(isReplit
       ? [

@@ -473,3 +473,38 @@ export function imageIndexFor(product: ShopifyProduct, url?: string | null): num
 export function productCategory(product: ShopifyProduct): string | null {
   return product.productType?.trim() || null;
 }
+
+// ---------- newsletter ----------
+
+const NEWSLETTER_SIGNUP_MUTATION = `
+  mutation NewsletterSignup($input: CustomerCreateInput!) {
+    customerCreate(input: $input) {
+      customer { id }
+      customerUserErrors { code field message }
+    }
+  }
+`;
+
+export type NewsletterResult = "subscribed" | "already" | "invalid" | "error";
+
+// Adds the email to Shopify as a customer who accepts marketing (Shopify admin → Customers,
+// filter "Email subscription: Subscribed"). The Storefront API needs a password to create a
+// customer, so a random one is generated; the person can set their own via "Forgot password".
+export async function subscribeToNewsletter(email: string): Promise<NewsletterResult> {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  const password = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("") + "Aa1!";
+  try {
+    const res = await storefrontApiRequest<{
+      customerCreate: { customer: { id: string } | null; customerUserErrors: { code: string; message: string }[] };
+    }>(NEWSLETTER_SIGNUP_MUTATION, { input: { email: email.trim(), password, acceptsMarketing: true } });
+    const payload = res?.data?.customerCreate;
+    if (!payload) return "error";
+    if (payload.customer) return "subscribed";
+    const codes = payload.customerUserErrors.map((e) => e.code);
+    if (codes.includes("TAKEN") || codes.includes("CUSTOMER_DISABLED")) return "already";
+    if (codes.includes("INVALID")) return "invalid";
+    return "error";
+  } catch {
+    return "error";
+  }
+}

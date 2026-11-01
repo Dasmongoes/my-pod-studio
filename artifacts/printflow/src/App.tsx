@@ -11,6 +11,7 @@ import PolicyPage from "./pages/PolicyPage";
 import ScrollToTop from "./components/ScrollToTop";
 import CartDrawer from "./components/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 60 * 5, refetchOnWindowFocus: false } },
@@ -38,6 +39,7 @@ const App = () => (
         </Routes>
         <CartDrawer />
       </BrowserRouter>
+      <Analytics />
     </TooltipProvider>
   </QueryClientProvider>
 );
