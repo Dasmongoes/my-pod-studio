@@ -2,6 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useCartStore } from "@/store/useCartStore";
 import { Plus, Minus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatPrice } from "@/lib/shopify";
 
 const CartDrawer = () => {
   const { items, isCartOpen, toggleCartOpen, updateQuantity, removeItem, checkout, isCheckingOut } = useCartStore();
@@ -72,7 +73,7 @@ const CartDrawer = () => {
                             {item.product.title}
                           </Link>
                           <span className="text-xs font-medium shrink-0">
-                            {item.variant.price.currencyCode} {(parseFloat(item.variant.price.amount) * item.quantity).toFixed(2)}
+                            {formatPrice(parseFloat(item.variant.price.amount) * item.quantity, item.variant.price.currencyCode)}
                           </span>
                         </div>
                         
@@ -118,7 +119,7 @@ const CartDrawer = () => {
               <div className="flex justify-between items-center mb-6">
                 <span className="text-xs uppercase tracking-widest font-medium text-muted-foreground">Subtotal</span>
                 <span className="text-sm font-semibold">
-                  {items[0]?.variant.price.currencyCode || "USD"} {subtotal.toFixed(2)}
+                  {formatPrice(subtotal, items[0]?.variant.price.currencyCode || "INR")}
                 </span>
               </div>
               

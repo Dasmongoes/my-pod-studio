@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { shopify, ShopifyProduct, ShopifyProductVariant } from "@/lib/shopify";
+import { shopify, ShopifyProduct, ShopifyProductVariant, formatPrice } from "@/lib/shopify";
 import { useCartStore } from "@/store/useCartStore";
 import Navigation from "@/components/Navigation";
 import { ArrowLeft, Loader, ShoppingBag, Check, ShieldCheck, Truck, RefreshCw } from "lucide-react";
@@ -180,8 +180,10 @@ const ProductDetails = () => {
               {/* Price and Stock status */}
               <div className="flex justify-between items-center border-y border-border py-4">
                 <span className="text-xl font-semibold text-foreground">
-                  {activeVariant ? activeVariant.price.currencyCode : product.priceRange.minVariantPrice.currencyCode} {" "}
-                  {activeVariant ? parseFloat(activeVariant.price.amount).toFixed(2) : parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                  {formatPrice(
+                    (activeVariant ? activeVariant.price : product.priceRange.minVariantPrice).amount,
+                    (activeVariant ? activeVariant.price : product.priceRange.minVariantPrice).currencyCode,
+                  )}
                 </span>
                 
                 <span className={`text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 border ${
@@ -313,7 +315,7 @@ const ProductDetails = () => {
                     </div>
                     <div className="flex justify-between items-start text-xs uppercase tracking-wider font-semibold">
                       <span className="line-clamp-1">{recommend.title}</span>
-                      <span>{recPrice.currencyCode} {parseFloat(recPrice.amount).toFixed(2)}</span>
+                      <span>{formatPrice(recPrice.amount, recPrice.currencyCode)}</span>
                     </div>
                   </Link>
                 );

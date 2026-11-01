@@ -330,3 +330,22 @@ export async function fetchCart(cartId: string): Promise<{ id: string; totalQuan
   const res = await storefrontApiRequest<any>(CART_QUERY, { id: cartId });
   return res?.data?.cart || null;
 }
+
+// ---------- formatting ----------
+
+// Formats a price with its currency symbol, e.g. "₹899" or "₹1,249.50".
+// Whole amounts drop the ".00"; INR uses Indian digit grouping.
+export function formatPrice(amount: string | number, currencyCode: string): string {
+  const value = typeof amount === "string" ? parseFloat(amount) : amount;
+  const isWhole = Number.isInteger(Math.round(value * 100) / 100);
+  try {
+    return new Intl.NumberFormat(currencyCode === "INR" ? "en-IN" : undefined, {
+      style: "currency",
+      currency: currencyCode,
+      minimumFractionDigits: isWhole ? 0 : 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return `${currencyCode} ${value.toFixed(2)}`;
+  }
+}

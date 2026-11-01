@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { shopify, ShopifyProduct } from "@/lib/shopify";
+import { shopify, ShopifyProduct, formatPrice } from "@/lib/shopify";
 import { useCartStore } from "@/store/useCartStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -102,7 +102,7 @@ const FeaturedDesigns = () => {
                       {p.title}
                     </h3>
                     <span className="text-xs font-bold shrink-0">
-                      {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+                      {formatPrice(price.amount, price.currencyCode)}
                     </span>
                   </div>
 
