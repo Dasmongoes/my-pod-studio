@@ -38,7 +38,7 @@ const ProductDetails = () => {
         initial[opt.name] = opt.value;
       });
       setSelectedOptions(initial);
-      setSelectedImageIndex(0);
+      setSelectedImageIndex(Math.max(0, imageIndexFor(product, defaultVariant.image?.url)));
       setQuantity(1);
     }
   }, [product]);
@@ -76,10 +76,14 @@ const ProductDetails = () => {
   ) || product.variants[0];
 
   const handleOptionChange = (optionName: string, value: string) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [optionName]: value,
-    }));
+    const next = { ...selectedOptions, [optionName]: value };
+    setSelectedOptions(next);
+    // Jump the gallery to the newly selected variant's photo, if it has one
+    const nextVariant = product.variants.find((variant) =>
+      variant.selectedOptions.every((opt) => next[opt.name] === opt.value)
+    );
+    const idx = imageIndexFor(product, nextVariant?.image?.url);
+    if (idx >= 0) setSelectedImageIndex(idx);
   };
 
   const handleAddToBag = () => {
@@ -99,8 +103,8 @@ const ProductDetails = () => {
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
 
-  // Use variant specific image if available, fallback to selected index image, fallback to first image
-  const displayImage = activeVariant?.image?.url || product.images[selectedImageIndex]?.url || product.images[0]?.url;
+  // The gallery selection drives the main image; fall back to the variant's image, then the first image
+  const displayImage = product.images[selectedImageIndex]?.url || activeVariant?.image?.url || product.images[0]?.url;
 
   return (
     <div className="min-h-screen bg-background">
@@ -329,3 +333,10 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+// Index of an image URL within the product's gallery (ignores Shopify's ?v= cache-busting query), or -1.
+function imageIndexFor(product: ShopifyProduct, url?: string | null): number {
+  if (!url) return -1;
+  const base = url.split("?")[0];
+  return product.images.findIndex((img) => img.url.split("?")[0] === base);
+}
