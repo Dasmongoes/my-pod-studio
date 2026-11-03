@@ -9,7 +9,7 @@ const digits = (s: string) => s.replace(/\D/g, "");
 
 // Contact links built from src/config/contact.ts; empty values are skipped.
 const contactLinks = [
-  CONTACT.email && { href: `mailto:${CONTACT.email}`, label: CONTACT.email, Icon: Mail },
+  ...CONTACT.emails.map((email) => ({ href: `mailto:${email}`, label: email, Icon: Mail })),
   CONTACT.instagram && {
     href: `https://instagram.com/${CONTACT.instagram.replace(/^@/, "")}`,
     label: `@${CONTACT.instagram.replace(/^@/, "")}`,
