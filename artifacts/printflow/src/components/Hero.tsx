@@ -16,7 +16,7 @@ const Hero = () => {
       <div className="relative h-full flex flex-col justify-between px-6 lg:px-10 py-24 pt-32 text-white">
         <div className="flex items-start justify-between">
           <span className="text-eyebrow opacity-80">FW 26 / Vol. 01</span>
-          <span className="text-eyebrow opacity-80 hidden md:block">Printed on demand · Shipped worldwide</span>
+          <span className="text-eyebrow opacity-80 hidden md:block">Printed on demand · Shipped across India</span>
         </div>
 
         <div className="max-w-5xl">

@@ -289,7 +289,7 @@ const ProductDetails = () => {
               </div>
               <div className="space-y-1.5 p-3 bg-muted/30">
                 <Truck className="w-4 h-4 mx-auto text-foreground" />
-                <p className="font-semibold text-foreground">Worldwide Shipping</p>
+                <p className="font-semibold text-foreground">Shipping Across India</p>
                 <p>Tracked Delivery</p>
               </div>
               <div className="space-y-1.5 p-3 bg-muted/30">

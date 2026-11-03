@@ -2,7 +2,7 @@ const steps = [
   { n: "01", title: "Pick A Tee", desc: "Browse our edit of printed t-shirts — graphics, typography, oversized, washed." },
   { n: "02", title: "Choose Size", desc: "Heavyweight 260 GSM cotton. Unisex sizing from XS to 3XL." },
   { n: "03", title: "We Print", desc: "Each tee is printed to order on premium blanks — never warehoused." },
-  { n: "04", title: "Ships Worldwide", desc: "Packed and dispatched within 72 hours. Delivered to your door." },
+  { n: "04", title: "Ships Across India", desc: "Packed and dispatched within 72 hours. Delivered to your door." },
 ];
 
 const HowItWorks = () => {
