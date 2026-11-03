@@ -2,7 +2,7 @@
 export const CONTACT = {
   // Every address listed here is shown, in this order. "note" is optional text shown under it.
   emails: [
-    { address: "support@bincohub.com" },
+    { address: "support@bincohub.com", note: "Order questions and returns" },
     { address: "hello@bincohub.com", note: "Collaborations, wholesale enquiries and general messages" },
   ] as { address: string; note?: string }[],
   // Instagram username without the @, e.g. "bincohub"
