@@ -8,6 +8,7 @@ import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 import PolicyPage from "./pages/PolicyPage";
+import Contact from "./pages/Contact";
 import ScrollToTop from "./components/ScrollToTop";
 import CartDrawer from "./components/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:handle" element={<ProductDetails />} />
           <Route path="/policies/:handle" element={<PolicyPage />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CartDrawer />
