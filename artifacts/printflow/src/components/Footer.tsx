@@ -15,7 +15,7 @@ const contactLinks = [
     label: `@${CONTACT.instagram.replace(/^@/, "")}`,
     Icon: FaInstagram,
   },
-  CONTACT.whatsapp && { href: `https://wa.me/${digits(CONTACT.whatsapp)}`, label: "WhatsApp us", Icon: FaWhatsapp },
+  CONTACT.whatsapp && { href: `https://wa.me/${digits(CONTACT.whatsapp)}`, label: CONTACT.whatsapp, Icon: FaWhatsapp },
 ].filter(Boolean) as { href: string; label: string; Icon: React.ComponentType<{ className?: string }> }[];
 
 // Shared footer. Policy links come from Shopify, so a new policy appears here as soon as it's published.

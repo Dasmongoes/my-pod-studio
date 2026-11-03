@@ -4,6 +4,6 @@ export const CONTACT = {
   emails: ["support@bincohub.com", "hello@bincohub.com"],
   // Instagram username without the @, e.g. "bincohub"
   instagram: "",
-  // WhatsApp number with country code, digits only, e.g. "919876543210"
-  whatsapp: "919175856853",
+  // WhatsApp number with country code, shown as written, e.g. "+91 98765 43210"
+  whatsapp: "+91 91758 56853",
 };
