@@ -7,6 +7,7 @@ import {
   swatchColor,
 } from "@/lib/shopify";
 import { cn } from "@/lib/utils";
+import SizeGuide from "@/components/SizeGuide";
 
 interface VariantPickerProps {
   product: ShopifyProduct;
@@ -29,10 +30,13 @@ const VariantPicker = ({ product, selected, onChange, compact = false }: Variant
 
         return (
           <div key={option.name} className="space-y-3">
-            <p className="text-[10px] uppercase tracking-widest font-bold text-foreground">
-              {optionLabel(option.name)}:
-              <span className="text-muted-foreground font-medium ml-1.5">{selected[option.name]}</span>
-            </p>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[10px] uppercase tracking-widest font-bold text-foreground">
+                {optionLabel(option.name)}:
+                <span className="text-muted-foreground font-medium ml-1.5">{selected[option.name]}</span>
+              </p>
+              {option.name.toLowerCase() === "size" && <SizeGuide />}
+            </div>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={optionLabel(option.name)}>
               {values.map((val) => {
                 const isSelected = selected[option.name] === val;
