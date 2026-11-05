@@ -1,4 +1,4 @@
-// Shopify Storefront API client for PRINTFLOW.
+// Shopify Storefront API client for BincoHub.
 // Storefront token is a public, browser-safe credential.
 
 export const SHOPIFY_API_VERSION = "2025-07";
@@ -277,6 +277,15 @@ export const shopify = {
     return node ? normalizeProduct(node) : null;
   },
 };
+
+// Image description for screen readers and search. Many Shopify images only have a filename
+// such as "Left_Shoulder_5_c_2.jpg" as their alt text, which becomes "left shoulder view".
+export function imageAlt(altText: string | null | undefined, title: string): string {
+  if (!altText) return title;
+  if (!/\.(jpe?g|png|webp|gif)$/i.test(altText)) return altText;
+  const view = altText.replace(/_\d.*$/, "").replace(/\.\w+$/, "").replace(/[_-]+/g, " ").trim().toLowerCase();
+  return view ? `${title}, ${view} view` : title;
+}
 
 // ---------- cart ----------
 

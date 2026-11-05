@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ShopifyImage } from "@/lib/shopify";
+import { ShopifyImage, imageAlt } from "@/lib/shopify";
 
 interface ProductGalleryProps {
   images: ShopifyImage[];
@@ -77,7 +77,7 @@ const ProductGallery = ({ images, index, onIndexChange, title }: ProductGalleryP
         <img
           key={current.url}
           src={current.url}
-          alt={current.altText || `${title} — image ${index + 1}`}
+          alt={imageAlt(current.altText, title)}
           draggable={false}
           className="w-full h-full object-cover animate-fade-in transition-transform duration-200 ease-out"
           style={
@@ -161,7 +161,7 @@ const ProductGallery = ({ images, index, onIndexChange, title }: ProductGalleryP
             <img
               key={current.url}
               src={current.url}
-              alt={current.altText || title}
+              alt={imageAlt(current.altText, title)}
               className="max-w-full max-h-full object-contain animate-fade-in"
             />
             <button

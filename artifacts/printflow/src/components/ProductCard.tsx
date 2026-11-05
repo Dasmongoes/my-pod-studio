@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye } from "lucide-react";
-import { ShopifyProduct, formatPrice, isColorOption, swatchColor } from "@/lib/shopify";
+import { ShopifyProduct, formatPrice, imageAlt, isColorOption, swatchColor } from "@/lib/shopify";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -41,7 +41,7 @@ const ProductCard = ({ product, index = 0, subtitle, onQuickView }: ProductCardP
           <>
             <img
               src={primary.url}
-              alt={primary.altText || product.title}
+              alt={imageAlt(primary.altText, product.title)}
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105"
             />

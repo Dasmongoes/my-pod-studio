@@ -34,6 +34,8 @@ const Footer = () => {
           <div>
             <h4 className="text-eyebrow mb-4">Help</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
+              <li><Link to="/about" className="hover:text-foreground">About Us</Link></li>
+              <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
               <li><Link to="/contact" className="hover:text-foreground">Contact Us</Link></li>
               {policies.map((p) => (
                 <li key={p.handle}>
@@ -45,7 +47,7 @@ const Footer = () => {
             </ul>
           </div>
           {contactLinks.length > 0 && (
-            <div>
+            <div className="col-span-2 md:col-span-1">
               <h4 className="text-eyebrow mb-4">Contact</h4>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 {contactLinks.map(({ href, label, note, Icon }) => (

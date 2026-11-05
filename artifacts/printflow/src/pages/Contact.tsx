@@ -2,9 +2,10 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { contactLinks } from "@/lib/contactLinks";
+import { PAGE_META } from "@/config/seo";
 
 const Contact = () => {
-  usePageTitle("Contact Us");
+  usePageTitle(PAGE_META.contact.title, { description: PAGE_META.contact.description });
 
   return (
     <div className="min-h-screen bg-background">

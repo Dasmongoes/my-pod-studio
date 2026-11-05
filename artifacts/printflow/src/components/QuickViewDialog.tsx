@@ -9,6 +9,7 @@ import {
   defaultSelection,
   findVariant,
   formatPrice,
+  imageAlt,
   imageIndexFor,
 } from "@/lib/shopify";
 
@@ -55,7 +56,7 @@ const QuickViewDialog = ({ product, onOpenChange }: QuickViewDialogProps) => {
           <div className="bg-muted">
             <div className="aspect-[4/5]">
               {image?.url && (
-                <img src={image.url} alt={image.altText || product.title} className="w-full h-full object-cover" />
+                <img src={image.url} alt={imageAlt(image.altText, product.title)} className="w-full h-full object-cover" />
               )}
             </div>
             {product.images.length > 1 && (

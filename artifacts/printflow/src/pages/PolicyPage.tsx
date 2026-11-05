@@ -15,7 +15,7 @@ const PolicyPage = () => {
   });
   const policy = policies.find((p) => p.handle === handle);
 
-  usePageTitle(policy?.title ?? (isLoading ? null : "Policy not found"));
+  usePageTitle(policy?.title ?? (isLoading ? null : "Policy not found"), { noindex: !isLoading && !policy });
 
   return (
     <div className="min-h-screen bg-background">

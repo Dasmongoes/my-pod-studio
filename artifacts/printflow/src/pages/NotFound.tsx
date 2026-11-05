@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 const NotFound = () => {
-  usePageTitle("Page not found");
+  usePageTitle("Page not found", { noindex: true });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

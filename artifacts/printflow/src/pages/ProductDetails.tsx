@@ -13,6 +13,7 @@ import {
 import { useCartStore } from "@/store/useCartStore";
 import { useRecentlyViewed } from "@/store/useRecentlyViewed";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { productDescription } from "@/config/seo";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
@@ -54,7 +55,17 @@ const ProductDetails = () => {
     staleTime: 1000 * 60 * 30,
   });
 
-  usePageTitle(product?.title ?? (isLoading ? null : "Product not found"));
+  usePageTitle(product?.title ?? (isLoading ? null : "Product not found"), {
+    description: product
+      ? productDescription(
+          product.title,
+          product.description,
+          parseFloat(product.priceRange.minVariantPrice.amount),
+          product.priceRange.minVariantPrice.currencyCode,
+        )
+      : undefined,
+    noindex: !isLoading && !product,
+  });
 
   // Pre-select the first in-stock variant when the product loads
   useEffect(() => {
@@ -284,18 +295,18 @@ const ProductDetails = () => {
             <div className="grid grid-cols-3 gap-2 text-center text-[9px] uppercase tracking-wider text-muted-foreground">
               <div className="space-y-1.5 p-3 bg-muted/30">
                 <ShieldCheck className="w-4 h-4 mx-auto text-foreground" />
-                <p className="font-semibold text-foreground">Premium Quality</p>
-                <p>260 GSM Terry Cotton</p>
+                <p className="font-semibold text-foreground">Terry Fabric</p>
+                <p>260 GSM, 90/10 Cotton-Poly</p>
               </div>
               <div className="space-y-1.5 p-3 bg-muted/30">
                 <Truck className="w-4 h-4 mx-auto text-foreground" />
                 <p className="font-semibold text-foreground">Shipping Across India</p>
-                <p>Tracked Delivery</p>
+                <p>Dispatched in 1–5 Days</p>
               </div>
               <div className="space-y-1.5 p-3 bg-muted/30">
                 <RefreshCw className="w-4 h-4 mx-auto text-foreground" />
                 <p className="font-semibold text-foreground">Made on Demand</p>
-                <p>Sustainable Print</p>
+                <p>Printed for Your Order</p>
               </div>
             </div>
 
@@ -314,28 +325,29 @@ const ProductDetails = () => {
                   </AccordionContent>
                 </AccordionItem>
               )}
-              {(shippingPolicy || refundPolicy) && (
-                <AccordionItem value="shipping">
-                  <AccordionTrigger className="text-[10px] uppercase tracking-widest font-bold">
-                    Shipping & Returns
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground space-y-2">
-                    <p>Every piece is printed to order, then shipped to you.</p>
-                    <div className="flex gap-4 text-xs uppercase tracking-widest font-semibold">
-                      {shippingPolicy && (
-                        <Link to={`/policies/${shippingPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
-                          Shipping policy
-                        </Link>
-                      )}
-                      {refundPolicy && (
-                        <Link to={`/policies/${refundPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
-                          Refund policy
-                        </Link>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
+              <AccordionItem value="shipping">
+                <AccordionTrigger className="text-[10px] uppercase tracking-widest font-bold">
+                  Shipping & Returns
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground space-y-2">
+                  <p>Every piece is printed to order and dispatched in 1–5 days. Shipping is calculated at checkout.</p>
+                  <div className="flex flex-wrap gap-4 text-xs uppercase tracking-widest font-semibold">
+                    {shippingPolicy && (
+                      <Link to={`/policies/${shippingPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
+                        Shipping policy
+                      </Link>
+                    )}
+                    {refundPolicy && (
+                      <Link to={`/policies/${refundPolicy.handle}`} className="underline underline-offset-4 hover:text-foreground">
+                        Refund policy
+                      </Link>
+                    )}
+                    <Link to="/faq" className="underline underline-offset-4 hover:text-foreground">
+                      FAQ
+                    </Link>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
         </div>

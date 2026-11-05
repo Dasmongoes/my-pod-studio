@@ -9,6 +9,8 @@ import ProductDetails from "./pages/ProductDetails";
 import NotFound from "./pages/NotFound";
 import PolicyPage from "./pages/PolicyPage";
 import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Faq from "./pages/Faq";
 import ScrollToTop from "./components/ScrollToTop";
 import CartDrawer from "./components/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
@@ -37,6 +39,8 @@ const App = () => (
           <Route path="/product/:handle" element={<ProductDetails />} />
           <Route path="/policies/:handle" element={<PolicyPage />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CartDrawer />

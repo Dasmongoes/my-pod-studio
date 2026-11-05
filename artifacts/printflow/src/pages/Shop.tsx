@@ -9,6 +9,7 @@ import ProductCard, { ProductCardSkeleton } from "@/components/ProductCard";
 import QuickViewDialog from "@/components/QuickViewDialog";
 import { matchesSearch } from "@/components/SearchDialog";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { PAGE_META } from "@/config/seo";
 
 const SORTS = [
   { value: "featured", label: "Featured" },
@@ -28,7 +29,9 @@ const Shop = () => {
   const sortBy = searchParams.get("sort") || "featured";
   const inStockOnly = searchParams.get("instock") === "1";
 
-  usePageTitle(query ? `Search: ${query}` : category !== "All" ? category : "Shop");
+  usePageTitle(query ? `Search: ${query}` : category !== "All" ? category : PAGE_META.shop.title, {
+    description: PAGE_META.shop.description,
+  });
 
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(searchParams);
