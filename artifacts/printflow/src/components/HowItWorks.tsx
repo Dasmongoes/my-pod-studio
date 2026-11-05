@@ -1,7 +1,7 @@
 const steps = [
-  { n: "01", title: "Pick A Tee", desc: "Browse our edit of printed t-shirts — graphics, typography, oversized, washed." },
-  { n: "02", title: "Choose Size", desc: "Heavyweight 260 GSM cotton. Unisex sizing from XS to 3XL." },
-  { n: "03", title: "We Print", desc: "Each tee is printed to order on premium blanks — never warehoused." },
+  { n: "01", title: "Pick A Tee", desc: "Browse our edit of printed t-shirts — graphics and oversized fits." },
+  { n: "02", title: "Choose Size", desc: "260 GSM terry fabric. Unisex sizing from XS to 3XL." },
+  { n: "03", title: "We Print", desc: "Each tee is printed to order, so nothing sits in a warehouse." },
   { n: "04", title: "Ships Across India", desc: "Printed and dispatched in 1–5 days. Delivered to your door." },
 ];
 
@@ -15,7 +15,7 @@ const HowItWorks = () => {
             <h2 className="text-display text-5xl md:text-7xl">Made on<br/>demand.</h2>
           </div>
           <p className="lg:col-span-6 lg:col-start-7 text-lg text-muted-foreground leading-relaxed self-end">
-            One product. Done properly. Every t-shirt is printed only after it's ordered — no inventory, no waste, no compromise on quality.
+            Every t-shirt is printed only after it's ordered. No warehouse full of unsold stock.
           </p>
         </div>
 

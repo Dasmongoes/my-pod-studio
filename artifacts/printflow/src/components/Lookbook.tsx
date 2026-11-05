@@ -18,13 +18,13 @@ const Lookbook = () => {
           <div className="max-w-md">
             <p className="text-eyebrow eyebrow-bar opacity-70 mb-6">The Tee / FW26</p>
             <h2 className="text-display text-5xl lg:text-7xl mb-8">
-              One tee.<br/>Done right.
+              Made to<br/>be worn.
             </h2>
             <p className="text-base opacity-70 mb-10 leading-relaxed">
-              Premium 260 GSM heavyweight cotton. Garment dyed, washed for a worn-in hand, and printed with archival inks. Built to outlast trends.
+              260 GSM terry fabric in a 90/10 cotton-polyester blend. A roomy unisex fit with drop shoulders, printed only after you order.
             </p>
             <a href="#journal" className="inline-flex items-center gap-3 border-b-2 border-highlight pb-1 text-eyebrow hover:opacity-70 transition-opacity">
-              Explore The Story →
+              See How It's Made →
             </a>
           </div>
         </div>
